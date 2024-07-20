@@ -26,12 +26,21 @@ const AnotherPage = ({ user }: AnotherPageProps) => {
   };
 
   return (
-    <section className='flex pt-32'>
+    <section className='flex pt-32 bg-gradient-to-br from-blue-100 via-transparent dark:from-Roxo/70 dark:via-transparent'>
       <div className="container px-4">
-        <div className="from-Roxo/80 to-zinc-900 to-40% bg-gradient-to-br w-full p-2 px-4 rounded-xl mb-7 flex justify-between items-center">
+
+
+        <div className="flex items-center relative rounded-xl mb-10 min-h-52 -z-10 w-full bg-cover bg-top bg-[url('/assets/images/PlayerBG.webp')]">
+          <div className=" bg-gradient-to-r from-zinc-900 w-full -z-10  h-full absolute rounded-xl"></div>
+          <div className="flex flex-col p-5 w-full relative">
+            <h3 className="text-4xl font-semibold z-30">Players</h3>
+            <p className="font-medium text-base">Confira abaixo, todos os players da U4nted Cup</p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-Roxo/10 to-zinc-900 backdrop-blur-xl w-full p-2 px-4 rounded-xl mb-7 flex justify-between items-center">
           <div>
-            <h3 className="font-semibold text-2xl">Players</h3>
-            <p className="text-zinc-200">Confira todos os jogadores da Uanted Cup</p>
+            <h3><span className="font-semibold">10</span> Players Encontrados</h3>
           </div>
           <div className="p-4">
             <div className="relative">

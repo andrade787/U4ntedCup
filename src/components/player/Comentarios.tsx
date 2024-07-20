@@ -14,6 +14,7 @@ import ComentariosPagination from './ComentariosPagination';
 import Link from 'next/link';
 import { Frown, LoaderCircle } from 'lucide-react';
 import { formatTimestamp } from '@/utils/formatTimestamp';
+import { Skeleton } from '../ui/skeleton';
 
 interface Comment {
   id: string;
@@ -39,7 +40,7 @@ export default function ComentariosPerfil() {
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedComments, setPaginatedComments] = useState<Comment[]>([]);
   const [noMoreComments, setNoMoreComments] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Alterado para true inicialmente
   const commentsPerPage = 6;
   const initialNick = user?.nickname?.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
 
@@ -68,6 +69,8 @@ export default function ComentariosPerfil() {
         description: "Não foi possível carregar os comentários. Tente novamente mais tarde.",
         variant: 'destructive'
       });
+    } finally {
+      setIsLoading(false); // Atualize o estado de carregamento após a tentativa de busca
     }
   };
 
@@ -190,23 +193,39 @@ export default function ComentariosPerfil() {
         }
 
         <div className="mt-4 mb-6 space-y-2">
-          {paginatedComments.length > 0 ? paginatedComments.map((com) => (
-            <div key={com.id} className="flex animate-in fade-in-50 hover:bg-zinc-700/50 rounded-xl transition-colors py-2">
-              <Link target='_blank' href={'/player/' + com.url} className=' hover:brightness-50 transition-all'>
-                <Avatar className="flex items-center justify-center bg-zinc-900 m-2 ">
-                  <AvatarImage src={com.photoURL || undefined}></AvatarImage>
-                  <AvatarFallback>{com.nickname?.charAt(0)}</AvatarFallback>
-                </Avatar>
-              </Link>
-              <div className="flex flex-col w-full">
-                <div className='flex items-center gap-2'>
-                  <Link target='_blank' href={'/player/' + com.url} className="flex items-center mb-1 transition-colors hover:text-zinc-300 text-zinc-100">{com.nickname}</Link>
-                  <h4 className="text-xs text-zinc-200">- {formatTimestamp(com.Created_at)}</h4>
+          {isLoading ? (
+            // Mostrar esqueleto de carregamento enquanto carrega
+            Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="flex bg-zinc-900 rounded-xl py-2">
+                <Skeleton className="flex items-center w-11 h-11 rounded-full justify-center bg-zinc-800 m-2" />
+                <div className="flex flex-col w-full">
+                  <div className='flex items-center gap-2'>
+                    <Skeleton className='h-5 w-32' />
+                    <Skeleton className='h-4 w-24' />
+                  </div>
+                  <Skeleton className="flex bg-zinc-800 rounded-xl mt-3 h-20 w-1/2" />
                 </div>
-                <ComentarioPlayer text={com.Comment.trim()} />
+              </Skeleton>
+            ))
+          ) : (
+            paginatedComments.length > 0 ? paginatedComments.map((com) => (
+              <div key={com.id} className="flex animate-in fade-in-50 hover:bg-zinc-700/50 rounded-xl transition-colors py-2">
+                <Link target='_blank' href={'/player/' + com.url} className='hover:brightness-50 transition-all'>
+                  <Avatar className="flex items-center justify-center bg-zinc-900 m-2">
+                    <AvatarImage src={com.photoURL || undefined}></AvatarImage>
+                    <AvatarFallback>{com.nickname?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </Link>
+                <div className="flex flex-col w-full">
+                  <div className='flex items-center gap-2'>
+                    <Link target='_blank' href={'/player/' + com.url} className="flex items-center mb-1 transition-colors hover:text-zinc-300 text-zinc-100">{com.nickname}</Link>
+                    <h4 className="text-xs text-zinc-200">- {formatTimestamp(com.Created_at)}</h4>
+                  </div>
+                  <ComentarioPlayer text={com.Comment.trim()} />
+                </div>
               </div>
-            </div>
-          )) : <h3 className='text-zinc-200 flex items-center gap-2 justify-center'><Frown /> Nenhum comentário encontrado no perfil de<span className='font-semibold'>{user?.nickname}</span>até o momento..</h3>}
+            )) : <h3 className='text-zinc-200 flex items-center gap-2 justify-center'><Frown /> Nenhum comentário encontrado no perfil de<span className='font-semibold'>{user?.nickname}</span> até o momento..</h3>
+          )}
         </div>
         <ComentariosPagination
           currentPage={currentPage}

@@ -82,41 +82,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
   return (
     <div className="flex flex-col">
       <div className="flex flex-wrap w-full gap-7">
-        {displayedPlayers.length > 0 ? (
-          displayedPlayers.map((player, index) => {
-            const backgroundUrl = player.capaUrl ? player.capaUrl : '/assets/images/uanted_thumb.png';
-            return (
-              <div key={index} className="flex flex-col bg-zinc-900 flex-1 min-w-96 rounded-xl animate-in fade-in-30">
-                <div className="flex flex-col items-center justify-center p-4 relative">
-                  <div className="w-full h-full rounded-xl opacity-40 bg-no-repeat bg-cover bg-center absolute" style={{ backgroundImage: `url('${backgroundUrl}')` }}></div>
-                  <div className="w-full h-full rounded-xl from-20% bg-gradient-to-t from-zinc-900 absolute"></div>
-                  <div className="relative w-full flex flex-col items-center justify-center">
-                    <Avatar className="w-28 h-28 mb-2">
-                      <AvatarImage src={player.photoURL}></AvatarImage>
-                      <AvatarFallback className="bg-zinc-800 flex w-full items-center justify-center text-2xl font-semibold">
-                        {player.nickname.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <h3 className="text-xl font-semibold text-center">{player.nickname}</h3>
-                    <h4 className="text-sm text-zinc-400 text-center">{player.name}</h4>
-                  </div>
-                </div>
-                <div className="flex justify-center">
-                  <Link href={'/player/' + player.url} className="w-full">
-                    <Button className="w-full rounded-t-none rounded-b-xl">Ver Perfil</Button>
-                  </Link>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="bg-gradient-to-r from-zinc-900 rounded-xl p-3 animate-in fade-in-65 w-full flex justify-center">
-            <h3 className="flex gap-2 items-center text-lg">
-              <Frown /> Nenhum player encontrado com o nick <span className="font-semibold">{search}</span>
-            </h3>
-          </div>
-        )}
-        {loading && (
+        {loading ? (
           <>
             {[...Array(3)].map((_, index) => (
               <Skeleton key={index} className="flex flex-col flex-1 min-w-96 rounded-xl">
@@ -130,6 +96,43 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
                 </div>
               </Skeleton>
             ))}
+          </>
+        ) : (
+          <>
+            {displayedPlayers.length > 0 ? (
+              displayedPlayers.map((player, index) => {
+                const backgroundUrl = player.capaUrl ? player.capaUrl : '/assets/images/uanted_thumb.png';
+                return (
+                  <div key={index} className="flex flex-col bg-zinc-900 flex-1 min-w-96 rounded-xl animate-in fade-in-30">
+                    <div className="flex flex-col items-center justify-center p-4 relative">
+                      <div className="w-full h-full rounded-xl opacity-40 bg-no-repeat bg-cover bg-center absolute" style={{ backgroundImage: `url('${backgroundUrl}')` }}></div>
+                      <div className="w-full h-full rounded-xl from-20% bg-gradient-to-t from-zinc-900 absolute"></div>
+                      <div className="relative w-full flex flex-col items-center justify-center">
+                        <Avatar className="w-28 h-28 mb-2">
+                          <AvatarImage src={player.photoURL}></AvatarImage>
+                          <AvatarFallback className="bg-zinc-800 flex w-full items-center justify-center text-2xl font-semibold">
+                            {player.nickname.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h3 className="text-xl font-semibold text-center">{player.nickname}</h3>
+                        <h4 className="text-sm text-zinc-400 text-center">{player.name}</h4>
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <Link href={'/player/' + player.url} className="w-full">
+                        <Button className="w-full rounded-t-none rounded-b-xl">Ver Perfil</Button>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="bg-gradient-to-r from-zinc-900 rounded-xl p-3 animate-in fade-in-65 w-full flex justify-center">
+                <h3 className="flex gap-2 items-center text-lg">
+                  <Frown /> Nenhum player encontrado com o nick <span className="font-semibold">{search}</span>
+                </h3>
+              </div>
+            )}
           </>
         )}
       </div>

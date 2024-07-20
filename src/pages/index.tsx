@@ -10,7 +10,6 @@ import { DiscordIcon } from "@/components/icons/DiscordIcon";
 import Image from "next/image";
 
 interface HomePageProps {
-
   user: User | null;
 }
 
