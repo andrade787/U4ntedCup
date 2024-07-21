@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "../ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { LogIn, LogOut, PlusCircle, User } from "lucide-react";
 import Image from "next/image";
 
 export default function Header() {
@@ -118,12 +118,17 @@ export default function Header() {
               </DropdownMenu>
             </>
           ) : (
-            <Link href="/login" className="mr-4">
-              Login
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button className="flex items-center gap-2" variant='roxo'><LogIn size={18} /> Entrar</Button>
+              </Link> ou
+              <Link href="/cadastro">
+                <Button className="flex items-center gap-2" variant='default'><PlusCircle size={18} />Cadastrar</Button>
+              </Link>
+            </div>
           )}
         </div>
       </div>
-    </header>
+    </header >
   );
 }
