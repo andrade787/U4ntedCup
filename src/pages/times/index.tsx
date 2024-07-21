@@ -5,9 +5,10 @@ import { useEffect } from "react";
 import { User } from "@/lib/types";
 import Image from "next/image";
 import { ValorantIcon } from "@/components/icons";
-import { SearchIcon, User2 } from "lucide-react";
+import { Frown, SearchIcon, User2 } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 interface TimesProps {
   user: User | null;
 }
@@ -37,7 +38,7 @@ export default function Times({ user }: TimesProps) {
         <section>
           <div className="bg-gradient-to-r from-Roxo/10 to-zinc-900 backdrop-blur-xl w-full p-2 px-4 rounded-xl mb-7 flex justify-between items-center">
             <div>
-              <h3><span className="font-semibold">10</span> Players Encontrados</h3>
+              <h3><span className="font-semibold">10</span> Times Encontrados</h3>
             </div>
             <div className="p-4">
               <div className="relative">
@@ -47,6 +48,17 @@ export default function Times({ user }: TimesProps) {
             </div>
           </div>
           <div className="flex flex-wrap gap-6">
+
+            <Skeleton className="flex flex-1 min-w-96 relative bg-zinc-900 rounded-xl">
+              <Skeleton className="rounded-l-xl bg-zinc-700 w-28 h-28" />
+              <div className="flex justify-between items-center w-full p-3 gap-1">
+                <Skeleton className="rounded-xl bg-zinc-700 w-36 h-5" />
+                <Skeleton className="rounded-xl bg-zinc-700 w-12 h-12" />
+              </div>
+            </Skeleton>
+            <div className="flex gap-2 items-center justify-center w-full p-5 bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-xl animate-in fade-in-30">
+              <Frown size={45} /> <h2 className="text-xl">Nenhum time cadastrado até o momento..</h2>
+            </div>
             <Link href='#' className="flex flex-1 min-w-96 relative group bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-xl animate-in fade-in-30 group">
               <Image className="rounded-l-xl group-hover:-translate-x-2 transition-all bg-zinc-800" alt="Nome Time" width={100} height={100} src="/assets/images/tag_novo_tapa_buraco.jpg" />
               <div className="flex justify-between items-center w-full p-3 gap-1">

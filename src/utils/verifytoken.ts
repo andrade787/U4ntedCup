@@ -40,12 +40,10 @@ export async function verifyAndRefreshToken(req: NextApiRequest, res: NextApiRes
 
         return decodedToken.uid;
       } catch (refreshError) {
-        console.error('Erro ao atualizar o token:', refreshError);
-        throw new Error('Erro ao atualizar o token');
+        return null; // Retorne null se não for possível atualizar o token
       }
     } else {
-      console.error('Erro na verificação do token:', error);
-      throw error;
+      return null; // Retorne null se o token não for válido
     }
   }
 }
@@ -63,9 +61,9 @@ async function refreshIdToken(refreshToken: string) {
     }
   } catch (err) {
     if (axios.isAxiosError(err)) {
-      console.error('Erro ao atualizar o token:', err.response?.data || err.message);
+      return null;
     } else {
-      console.error('Erro ao atualizar o token:', err);
+      return null; // Retorne null se não for possível atualizar o token
     }
     throw new Error('Erro ao atualizar o token');
   }

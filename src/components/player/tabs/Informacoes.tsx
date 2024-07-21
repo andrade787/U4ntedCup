@@ -1,10 +1,12 @@
-import { BookUser, Signature } from 'lucide-react';
+import { BookUser, CirclePlus, Signature } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
 import { AddConta } from '../edit/AddConta';
 import ContasDeJogos from '../ContasdeJogos';
 import ComentariosPerfil from '../Comentarios';
 import { usePlayer } from '@/context/PlayerContext';
+import { Button } from '@/components/ui/button';
+import CriarTime from '../edit/CriarTime';
 
 const Informacoes: React.FC = () => {
   const { playerData, isOwner } = usePlayer();
@@ -13,7 +15,10 @@ const Informacoes: React.FC = () => {
     <>
       <div className='flex-1 flex gap-5'>
         <div className='flex-1 bg-zinc-900/50 rounded-xl border p-2 hover:bg-zinc-900 transition-colors animate-in zoom-in-90'>
-          <h3 className='font-semibold text-lg flex items-center gap-2 mb-3'><BookUser size={20} /> Time</h3>
+          <div className='flex justify-between'>
+            <h3 className='font-semibold text-lg flex items-center gap-2 mb-3'><BookUser size={20} /> Time</h3>
+            <CriarTime />
+          </div>
           <h3 className='font-base flex items-center gap-2'>
             <Image
               className='rounded-2xl object-cover w-10 h-10'

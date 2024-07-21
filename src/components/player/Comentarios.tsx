@@ -35,20 +35,21 @@ const commentSchema = z.object({
 export default function ComentariosPerfil() {
   const { user } = useUser();
   const { toast } = useToast();
-  const { playerData, comments, setComments } = usePlayer();
+  const { playerData, comments, setComments, handleTabClick, tabRef } = usePlayer();
   const [comment, setComment] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedComments, setPaginatedComments] = useState<Comment[]>([]);
   const [noMoreComments, setNoMoreComments] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Alterado para true inicialmente
+  const [commentsLoaded, setCommentsLoaded] = useState(false); // Novo estado para controlar o carregamento de comentários
   const commentsPerPage = 6;
   const initialNick = user?.nickname?.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
 
   useEffect(() => {
-    if (comments.length === 0 && !noMoreComments) {
+    if (!commentsLoaded && !noMoreComments) {
       fetchComments();
     }
-  }, [comments]);
+  }, [commentsLoaded]);
 
   useEffect(() => {
     updatePaginatedComments();
@@ -62,6 +63,7 @@ export default function ComentariosPerfil() {
         setNoMoreComments(true);
       }
       setComments(response.data.comments.map(comment => ({ ...comment, url: comment.url || null })) || []);
+      setCommentsLoaded(true); // Define que os comentários foram carregados
     } catch (error) {
       console.log('Fetch error:', error);
       toast({

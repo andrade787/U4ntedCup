@@ -43,7 +43,7 @@ const PlayerPageContent = ({ user }: Props) => {
     <div className='bg-gradient-to-br from-blue-100 via-transparent dark:from-Roxo dark:via-transparent pb-20'>
       <section className='flex pt-32'>
         <div className='container px-4'>
-          <div className="relative rounded-xl w-full p-5 pt-10 pb-10">
+          <div className="relative rounded-xl w-full pt-10 pb-10">
             <div
               className={`relative flex justify-between rounded-xl p-5 pt-10 pb-10 w-full ${playerData.capaUrl ? '' : 'from-Roxo/80 bg-gradient-to-r'}`}
               style={{

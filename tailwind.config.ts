@@ -18,6 +18,12 @@ const config = {
       },
     },
     extend: {
+      width: {
+        '25': '6.25rem',
+      },
+      height: {
+        '25': '6.25rem',
+      },
       borderWidth: {
         '3': '3px',
       },
