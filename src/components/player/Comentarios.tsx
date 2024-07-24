@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Avatar } from "../ui/avatar";
 import { Textarea } from "../ui/textarea";
@@ -40,22 +40,12 @@ export default function ComentariosPerfil() {
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedComments, setPaginatedComments] = useState<Comment[]>([]);
   const [noMoreComments, setNoMoreComments] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Alterado para true inicialmente
-  const [commentsLoaded, setCommentsLoaded] = useState(false); // Novo estado para controlar o carregamento de comentários
+  const [isLoading, setIsLoading] = useState(true);
+  const [commentsLoaded, setCommentsLoaded] = useState(false);
   const commentsPerPage = 6;
   const initialNick = user?.nickname?.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
 
-  useEffect(() => {
-    if (!commentsLoaded && !noMoreComments) {
-      fetchComments();
-    }
-  }, [commentsLoaded]);
-
-  useEffect(() => {
-    updatePaginatedComments();
-  }, [comments, currentPage]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const response = await axios.post<{ comments: Comment[] }>('/api/player/getComment', { playerId: playerData.id });
       console.log('API response:', response.data);
@@ -63,7 +53,7 @@ export default function ComentariosPerfil() {
         setNoMoreComments(true);
       }
       setComments(response.data.comments.map(comment => ({ ...comment, url: comment.url || null })) || []);
-      setCommentsLoaded(true); // Define que os comentários foram carregados
+      setCommentsLoaded(true);
     } catch (error) {
       console.log('Fetch error:', error);
       toast({
@@ -72,15 +62,25 @@ export default function ComentariosPerfil() {
         variant: 'destructive'
       });
     } finally {
-      setIsLoading(false); // Atualize o estado de carregamento após a tentativa de busca
+      setIsLoading(false);
     }
-  };
+  }, [playerData.id, setComments, toast]);
 
-  const updatePaginatedComments = () => {
+  const updatePaginatedComments = useCallback(() => {
     const startIndex = (currentPage - 1) * commentsPerPage;
     const endIndex = startIndex + commentsPerPage;
     setPaginatedComments(comments.slice(startIndex, endIndex));
-  };
+  }, [comments, currentPage, commentsPerPage]);
+
+  useEffect(() => {
+    if (!commentsLoaded && !noMoreComments) {
+      fetchComments();
+    }
+  }, [commentsLoaded, noMoreComments, fetchComments]);
+
+  useEffect(() => {
+    updatePaginatedComments();
+  }, [comments, currentPage, updatePaginatedComments]);
 
   const handlePageChange = (page: number) => {
     const totalPages = Math.ceil(comments.length / commentsPerPage);
@@ -196,7 +196,6 @@ export default function ComentariosPerfil() {
 
         <div className="mt-4 mb-6 space-y-2">
           {isLoading ? (
-            // Mostrar esqueleto de carregamento enquanto carrega
             Array.from({ length: 4 }).map((_, index) => (
               <Skeleton key={index} className="flex bg-zinc-900 rounded-xl py-2">
                 <Skeleton className="flex items-center w-11 h-11 rounded-full justify-center bg-zinc-800 m-2" />

@@ -19,7 +19,9 @@ if (!admin.apps.length) {
     storageBucket: 'uanted.appspot.com'
   });
 }
+
 const firestore = admin.firestore();
 const auth = admin.auth();
+const storage = admin.storage().bucket();
 
-export { firestore, auth, admin };
+export { firestore, auth, storage, admin };

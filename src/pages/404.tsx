@@ -1,13 +1,5 @@
-// pages/404.js
-import { useUser } from "@/context/UserContext";
-
-export default function NotFound() {
-  const { user } = useUser();
-
+export default function Custom404() {
   return (
-    <div>
-      <span>Essa página não existe</span>
-      {user && <p>Olá, {user.name}</p>}
-    </div>
+    <h1>404 - Page Not Found</h1>
   );
 }

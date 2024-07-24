@@ -23,6 +23,7 @@ const config = {
       },
       height: {
         '25': '6.25rem',
+        '61': '15.80rem',
       },
       borderWidth: {
         '3': '3px',

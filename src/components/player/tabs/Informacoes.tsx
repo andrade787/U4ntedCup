@@ -1,11 +1,10 @@
-import { BookUser, CirclePlus, Signature } from 'lucide-react';
+import { BookUser, Signature } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
 import { AddConta } from '../edit/AddConta';
 import ContasDeJogos from '../ContasdeJogos';
 import ComentariosPerfil from '../Comentarios';
 import { usePlayer } from '@/context/PlayerContext';
-import { Button } from '@/components/ui/button';
 import CriarTime from '../edit/CriarTime';
 
 const Informacoes: React.FC = () => {

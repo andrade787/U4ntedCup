@@ -1,2 +1,4 @@
-COMENTARIOS DO PLAYER
-- ADICIONAR LOADING 
+adicionar na tela do player notificação de que ele foi chamado para o time (Colocar na tela da pagina do time tambem caso o usuario acesse) 
+    - Verificar o pedido de entrar para ver se o usuario ja não foi convidado, se ele for, adicionar no time normalmente
+    
+notificação para usuario que receber convite para entrar em um time

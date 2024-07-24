@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Crown, Edit } from "lucide-react";
+import { Biohazard, Crown, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from '@/components/ui/skeleton';
 import { EditPlayerTeam } from './EditPlayerTeam';
@@ -26,9 +26,19 @@ const CardPlayers: React.FC<PlayerCardProps> = ({ imageSrc, imageHref, playerNam
             <Link target="_blank" href={imageHref}>
               <h3 className="text-lg hover:text-zinc-400 transition-colors font-semibold mb-1">{playerName}</h3>
             </Link>
-            <div className="flex items-center justify-center gap-2 bg-zinc-700/50 rounded-xl p-1">
-              <Image width={20} height={20} alt="Controller" src='/assets/Valorant/Roles/ControllerClassSymbol.webp' />
-              <p>{role}</p>
+            <div className='flex gap-3'>
+              <div className="flex items-center justify-center gap-2 bg-zinc-700/50 rounded-xl p-1">
+                <Image width={18} height={18} alt="Controller" src='/assets/Valorant/Roles/ControllerClassSymbol.webp' />
+                <p>{role}</p>
+              </div>
+              <div className="flex items-center justify-center gap-2 bg-gradient-to-l from-Roxo/50 rounded-xl p-1">
+                <Biohazard size={21} />
+                <p>IGL</p>
+              </div>
+              <div className="flex items-center justify-center gap-2 bg-gradient-to-l from-blue-800/50 rounded-xl p-1">
+                <Biohazard size={21} />
+                <p>6° Player</p>
+              </div>
             </div>
           </div>
         </div>

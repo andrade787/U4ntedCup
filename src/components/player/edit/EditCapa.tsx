@@ -1,17 +1,11 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { AlertCircle, ImageIcon, TrashIcon } from "lucide-react"; // Import TrashIcon
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertCircle, ImageIcon, TrashIcon } from "lucide-react";
 import imageCompression from 'browser-image-compression';
 import { z } from 'zod';
 import { useToast } from "@/components/ui/use-toast";
+import Image from 'next/image';
 
 const imageSchema = z.object({
   file: z.instanceof(File).refine(file => file.size <= 1024 * 1024, {
@@ -167,7 +161,7 @@ export function EditCapa({ capaUrl }: EditCapaProps) {
         ) : (
           <div className="flex flex-col items-center justify-center w-full">
             <div className="flex items-center gap-5">
-              {previewUrl && <img className="w-24 rounded-xl" src={previewUrl} alt="Capa" />}
+              {previewUrl && <Image className="w-24 rounded-xl" src={previewUrl} alt="Capa" width={96} height={96} />}
               <Button variant='outline' onClick={() => document.getElementById('fileInput')?.click()}>
                 <ImageIcon size={16} className='mr-2' /> Alterar Capa
               </Button>

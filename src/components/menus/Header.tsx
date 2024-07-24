@@ -5,8 +5,12 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "../ui/dropdown-menu";
-import { LogIn, LogOut, PlusCircle, User } from "lucide-react";
+import { Bell, Check, LogIn, LogOut, PlusCircle, User, X } from "lucide-react";
 import Image from "next/image";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+
+
 
 export default function Header() {
   const { user, logout } = useUser();
@@ -96,7 +100,7 @@ export default function Header() {
           )}
 
           {user ? (
-            <>
+            <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger className="hover:brightness-50 transition-all">
                   <Avatar>
@@ -104,19 +108,56 @@ export default function Header() {
                     <AvatarFallback>{initialNick}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                <DropdownMenuContent className="p-0">
+                  <DropdownMenuLabel className="p-2 bg-zinc-800">{user.name}</DropdownMenuLabel>
                   <Link href={'/player/' + user.url}>
-                    <DropdownMenuItem className="cursor-pointer"><User size={20} className="mr-2" /> Meu Perfil</DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer bg-zinc-900 hover:bg-zinc-800 rounded-none px-2 py-3"><User size={20} className="mr-2" /> Meu Perfil</DropdownMenuItem>
                   </Link>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                  <DropdownMenuItem className="cursor-pointer bg-zinc-900 hover:bg-zinc-800 rounded-none px-2 py-3" onClick={handleLogout}>
                     <LogOut size={20} className="mr-2" /> Sair
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="relative flex justify-center items-center group bg-Roxo rounded-full p-2 cursor-pointer hover:bg-zinc-700 transition-colors">
+                    <Bell />
+                    <div className="absolute top-1 left-4 bg-Roxo px-1 rounded-full group-hover:bg-zinc-700 transition-colors">
+                      <p className="text-sm">2</p>
+                    </div>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 w-full max-w-96">
+                  <div className="flex flex-col">
+                    <div className="flex bg-zinc-800 items-center justify-between">
+                      <h4 className="p-3 font-medium leading-none">Notificações</h4>
+                      <h4 className="p-3 text-sm text-zinc-400 font-medium leading-none cursor-pointer hover:bg-zinc-700 rounded-r transition-colors">MARCAR TUDO COMO VISTO</h4>
+                    </div>
+                    <div className="flex flex-col bg-zinc-900">
+                      <div className="flex hover:bg-zinc-800/50  border-b-2 transition-colors">
+                        <div className="flex p-4 flex-col w-full">
+                          <div className="flex items-center gap-2">
+                            <Image className="" src="/assets/favicon.png" width={20} height={20} alt="icon" />
+                            <p className="text-zinc-100">QRZera quer fazer parte do seu time! <span className="font-medium">Deseja aceitar ?</span></p>
+                          </div>
+                          <p className="text-sm text-zinc-400 ml-7">Há 3 min</p>
+                        </div>
+                        <div className="flex bg-gradient-to-l from-zinc-800 items-center gap-2 py-4 pr-2">
+                          <div className="p-2 rounded-full hover:bg-zinc-700 transition-colors cursor-pointer">
+                            <Check />
+                          </div>
+                          <div className="p-2 rounded-full hover:bg-zinc-700 transition-colors cursor-pointer">
+                            <X />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+            </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/login">

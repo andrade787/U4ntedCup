@@ -26,3 +26,13 @@ export interface PlayerProps {
   gameData?: any;
   isOwner?: boolean | null;
 }
+
+export interface TeamContextProps {
+  team: any | null;
+}
+
+export interface TimesProps {
+  user: User;
+  ValueUrl: string | null;
+  team: any | null;
+}

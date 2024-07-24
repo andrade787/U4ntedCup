@@ -5,11 +5,13 @@ import "@/styles/globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const is404 = Component.name === "NotFound";
+
   return (
     <UserProvider>
       <main>
         <Toaster />
-        <Header />
+        {!is404 && <Header />}
         <Component {...pageProps} />
       </main>
     </UserProvider>

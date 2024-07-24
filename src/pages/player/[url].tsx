@@ -40,7 +40,7 @@ const PlayerPageContent = ({ user }: Props) => {
   }
 
   return (
-    <div className='bg-gradient-to-br from-blue-100 via-transparent dark:from-Roxo dark:via-transparent pb-20'>
+    <div className='bg-gradient-to-br from-Roxo/70 via-transparent pb-20'>
       <section className='flex pt-32'>
         <div className='container px-4'>
           <div className="relative rounded-xl w-full pt-10 pb-10">

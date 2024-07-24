@@ -23,7 +23,7 @@ export default function Times({ user }: TimesProps) {
   }, [user, setUser]);
 
   return (
-    <div className="bg-gradient-to-br pt-32  from-blue-100 via-transparent dark:from-Roxo/70 dark:via-transparent">
+    <div className="pt-32 bg-gradient-to-br from-Roxo/70 via-transparent">
       <div className="container px-3">
 
         <div className="flex items-center relative rounded-xl min-h-52 mb-10 -z-20 w-full bg-cover bg-center bg-[url('/assets/images/timesbg.webp')]">

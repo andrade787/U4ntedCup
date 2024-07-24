@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Button } from "@/components/ui/button";
@@ -30,16 +30,6 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
     fetchPlayers();
   }, []);
 
-  useEffect(() => {
-    filterPlayers();
-  }, [search, allPlayers]);
-
-  useEffect(() => {
-    if (page > 1) {
-      loadMorePlayers();
-    }
-  }, [page]);
-
   const fetchPlayers = async () => {
     setLoading(true);
     try {
@@ -58,7 +48,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
     }
   };
 
-  const filterPlayers = () => {
+  const filterPlayers = useCallback(() => {
     const filtered = allPlayers.filter((player) => {
       const nickname = player.nickname ? player.nickname.toLowerCase() : '';
       const name = player.name ? player.name.toLowerCase() : '';
@@ -67,13 +57,23 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
     setFilteredPlayers(filtered);
     setDisplayedPlayers(filtered.slice(0, playersPerPage));
     setPage(1); // Resetar a página ao filtrar
-  };
+  }, [allPlayers, search, playersPerPage]);
 
-  const loadMorePlayers = () => {
+  const loadMorePlayers = useCallback(() => {
     const startIndex = (page - 1) * playersPerPage;
     const newPlayers = filteredPlayers.slice(startIndex, startIndex + playersPerPage);
     setDisplayedPlayers((prevPlayers) => [...prevPlayers, ...newPlayers]);
-  };
+  }, [filteredPlayers, page, playersPerPage]);
+
+  useEffect(() => {
+    filterPlayers();
+  }, [search, allPlayers, filterPlayers]);
+
+  useEffect(() => {
+    if (page > 1) {
+      loadMorePlayers();
+    }
+  }, [page, loadMorePlayers]);
 
   const handleLoadMore = () => {
     setPage((prevPage) => prevPage + 1);
