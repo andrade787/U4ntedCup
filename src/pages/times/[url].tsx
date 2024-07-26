@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { ValorantIcon } from "@/components/icons";
-import { LockKeyhole, Users } from "lucide-react";
+import { LockKeyhole, UnlockKeyhole, Users } from "lucide-react";
 import Image from "next/image";
 import { firestore } from '@/firebase/firebaseAdmin';
 import EditarTime from "@/components/times/PaginaDoTime/editartime/EditarTime";
 import { TabNavigation, PlayersDoTime, PartidasDoTime, CampeonatosDoTime, TeamNotFound } from '@/components/times/PaginaDoTime/tabs';
 import { GetServerSideProps } from "next";
 import { withUser } from "@/lib/auth";
-import { TimesProps } from "@/lib/types";
+import { TeamProps } from "@/lib/types";
 import { useUser } from "@/context/UserContext";
 import { ComeIn } from "@/components/times/PaginaDoTime/comein";
 import { TeamProvider } from "@/context/TeamContext";
@@ -16,7 +16,8 @@ import React from "react";
 
 type TabType = 'players' | 'partidas' | 'campeonatos';
 
-const TimePage = ({ user, team, ValueUrl }: TimesProps) => {
+
+const TimePage = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
   const { setUser } = useUser();
   useEffect(() => {
     if (user) {
@@ -59,7 +60,7 @@ const TimePage = ({ user, team, ValueUrl }: TimesProps) => {
         <div className="container px-3 pt-36">
           <div className="flex justify-between items-center bg-gradient-to-l from-zinc-900 backdrop-blur-xl rounded-xl">
             <Image className="rounded-l-xl" src={team.logo} width={200} height={200} alt={team.name} />
-            <div className="flex w-full items-center flex-col justify-center">
+            <div className="flex items-center flex-col justify-center">
               <h1 className="font-semibold text-3xl mb-1">{team.name}</h1>
               <div className="flex gap-2">
                 <p className="flex items-center gap-2"><Users size={16} /> {team.players.length} Players</p>
@@ -67,13 +68,13 @@ const TimePage = ({ user, team, ValueUrl }: TimesProps) => {
               </div>
             </div>
             <div className="flex flex-col gap-3 mr-3">
-              <EditarTime />
-              <div>
+              {isOwner && <EditarTime />}
+              <div className="flex flex-col gap-2 flex-1">
                 <div className="flex items-center justify-center gap-1 p-1 bg-zinc-800 rounded-xl">
-                  <LockKeyhole size={18} />
+                  {team.privacy === 'private' ? <LockKeyhole size={18} /> : <UnlockKeyhole size={18} />}
                   <h3>Time {team.privacy === 'private' ? 'Privado' : 'Público'}</h3>
                 </div>
-                <ComeIn />
+                {team.privacy !== 'private' && !isOwner && user && <ComeIn />}
               </div>
             </div>
           </div>
@@ -89,6 +90,7 @@ const TimePage = ({ user, team, ValueUrl }: TimesProps) => {
             {activeTab === 'players' && <PlayersDoTime />}
             {activeTab === 'partidas' && <PartidasDoTime />}
             {activeTab === 'campeonatos' && <CampeonatosDoTime />}
+
           </div>
         </div>
       </div>
@@ -96,10 +98,10 @@ const TimePage = ({ user, team, ValueUrl }: TimesProps) => {
   );
 };
 
-const Time = ({ user, team, ValueUrl }: TimesProps) => {
+const Team = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
   return (
-    <TeamProvider team={team}>
-      <TimePage user={user} ValueUrl={ValueUrl} team={team} />
+    <TeamProvider user={user} team={team}>
+      <TimePage user={user} ValueUrl={ValueUrl} team={team} isOwner={isOwner} />
     </TeamProvider>
   );
 };
@@ -115,6 +117,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ValueUrl,
         user,
         team: null,
+        isOwner: false,
       },
     };
   }
@@ -128,16 +131,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           ValueUrl,
           user,
           team: null,
+          isOwner: false,
         },
       };
     }
 
     const teamData = teamSnapshot.docs[0].data();
+    const isOwner = user && teamData.owner === user.uid;
+
     console.log('teamData:', teamData);
+
     return {
       props: {
         user,
         team: teamData,
+        isOwner,
       },
     };
   } catch (error) {
@@ -146,9 +154,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         params,
         user,
         team: null,
+        isOwner: false,
       },
     };
   }
 };
 
-export default React.memo(Time);
+export default React.memo(Team);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,11 +6,16 @@ import Image from "next/image";
 import { ImageDown, ImageUp } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { z } from "zod";
+import { useTeam } from "@/context/TeamContext";
 
 export default function InformacoesTime() {
-  const [logo, setLogo] = useState<File | null>(null);
-  const [teamName, setTeamName] = useState('');
+  const { team, updateTeam } = useTeam();
   const { toast } = useToast();
+
+  const [teamName, setTeamName] = useState(team.name);
+  const [logo, setLogo] = useState<File | null>(null);
+
+  const initialLogoUrl = team.logo ? team.logo : null;
 
   const schema = useMemo(() => z.object({
     teamName: z.string()
@@ -29,16 +34,16 @@ export default function InformacoesTime() {
     if (logo) {
       return URL.createObjectURL(logo);
     }
-    return null;
-  }, [logo]);
+    return initialLogoUrl;
+  }, [logo, initialLogoUrl]);
 
   useEffect(() => {
     return () => {
-      if (logoUrl) {
+      if (logoUrl && logo) {
         URL.revokeObjectURL(logoUrl);
       }
     };
-  }, [logoUrl]);
+  }, [logoUrl, logo]);
 
   const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,14 +58,22 @@ export default function InformacoesTime() {
         return;
       }
       setLogo(file);
+      updateTeam({ logo: URL.createObjectURL(file) }); // Atualiza a logo no contexto
     }
-  }, [toast, schema.shape.logo]);
+  }, [toast, schema.shape.logo, updateTeam]);
+
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTeamName(event.target.value);
+    updateTeam({ name: event.target.value }); // Atualiza o nome no contexto
+  };
 
   return (
     <div className="flex flex-col space-y-2 mt-4 mb-5">
       <div className="mb-3">
         <Label>Nome do Time</Label>
         <Input
+          value={teamName}
+          onChange={handleNameChange}
           placeholder="Informe o nome do seu time"
         />
       </div>
@@ -74,7 +87,26 @@ export default function InformacoesTime() {
           style={{ display: 'none' }}
           onChange={handleImageUpload}
         />
-        {!logo && (
+        {!logo && initialLogoUrl && (
+          <div className="flex items-center gap-5">
+            <Image
+              className="w-14 h-14 object-cover rounded-full"
+              alt="Logo do Time"
+              width={60}
+              height={60}
+              src={initialLogoUrl}
+            />
+            <Button
+              className="flex items-center gap-1"
+              variant='outline'
+              type="button"
+              onClick={() => document.getElementById('upload-button')?.click()}
+            >
+              <ImageDown /> Alterar Logo
+            </Button>
+          </div>
+        )}
+        {!logo && !initialLogoUrl && (
           <Button
             className="flex items-center gap-1"
             variant='outline'

@@ -144,7 +144,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!url) {
     return {
-      notFound: true,
+      props: {
+        playerData: null,
+      },
     };
   }
 
@@ -193,7 +195,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } catch (error) {
     console.error('Error fetching user data:', error);
     return {
-      notFound: true,
+      props: {
+        playerData: null,
+      },
     };
   }
 };

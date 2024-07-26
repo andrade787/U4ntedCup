@@ -16,7 +16,7 @@ const Informacoes: React.FC = () => {
         <div className='flex-1 bg-zinc-900/50 rounded-xl border p-2 hover:bg-zinc-900 transition-colors animate-in zoom-in-90'>
           <div className='flex justify-between'>
             <h3 className='font-semibold text-lg flex items-center gap-2 mb-3'><BookUser size={20} /> Time</h3>
-            <CriarTime />
+            {isOwner && <CriarTime />}
           </div>
           <h3 className='font-base flex items-center gap-2'>
             <Image

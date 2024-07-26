@@ -4,8 +4,15 @@ import { Save, Settings2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import InformacoesTime from "./Informacoes";
 import ConfiguracoesTime from "./Configuracoes";
+import { useTeam } from "@/context/TeamContext";
 
 export default function EditarTime() {
+  const { team } = useTeam();
+
+  const handleSave = () => {
+    console.log("Team data saved:", team);
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -31,7 +38,7 @@ export default function EditarTime() {
             <ConfiguracoesTime />
           </TabsContent>
         </Tabs>
-        <Button className="flex items-center gap-2"><Save size={18} />Salvar Alterações</Button>
+        <Button className="flex items-center gap-2" onClick={handleSave}><Save size={18} />Salvar Alterações</Button>
       </DialogContent>
     </Dialog>
   );

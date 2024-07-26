@@ -21,10 +21,11 @@ export function ComeIn() {
     { role: 'Iniciador', imageUrl: '/assets/Valorant/Roles/InitiatorClassSymbol.webp', altText: 'Iniciador' },
     { role: 'Sentinela', imageUrl: '/assets/Valorant/Roles/SentinelClassSymbol.webp', altText: 'Sentinela' },
   ];
+
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="flex items-center gap-1" variant='roxo'><CircleFadingPlus size={19} /> Entrar no Time</Button>
+        <Button className="flex items-center gap-1 w-full flex-1" variant='roxo'><CircleFadingPlus size={19} /> Entrar no Time</Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
 
