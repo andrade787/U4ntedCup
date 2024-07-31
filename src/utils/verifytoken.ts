@@ -14,23 +14,21 @@ export async function verifyAndRefreshToken(req: NextApiRequest, res: NextApiRes
   const refreshToken = cookies.refreshToken;
 
   if (!token) {
-    // Token não fornecido, retorne null indicando que o usuário não está logado
     return null;
   }
 
   try {
-    // Verifique o token e obtenha o UID do usuário
     const decodedToken = await admin.auth().verifyIdToken(token);
-    return decodedToken.uid;
+
+    // Retorna o uid e o token atual sem mudanças
+    return { uid: decodedToken.uid, token: token };
   } catch (err) {
     const error = err as FirebaseError;
     if (error.code === 'auth/id-token-expired' && refreshToken) {
-      // O token expirou, tente atualizar o token com o refresh token
       try {
         const newIdToken = await refreshIdToken(refreshToken);
         const decodedToken = await admin.auth().verifyIdToken(newIdToken);
 
-        // Defina o novo token no cookie
         res.setHeader('Set-Cookie', cookie.serialize('token', newIdToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -38,19 +36,19 @@ export async function verifyAndRefreshToken(req: NextApiRequest, res: NextApiRes
           path: '/',
         }));
 
-        return decodedToken.uid;
+        return { uid: decodedToken.uid, token: newIdToken };
       } catch (refreshError) {
-        return null; // Retorne null se não for possível atualizar o token
+        return null;
       }
     } else {
-      return null; // Retorne null se o token não for válido
+      return null;
     }
   }
 }
 
 async function refreshIdToken(refreshToken: string) {
   try {
-    const response = await axios.post(`https://securetoken.googleapis.com/v1/token?key=${process.env.FIREBASE_API_KEY}`, {
+    const response = await axios.post(`https://securetoken.googleapis.com/v1/token?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     });
@@ -61,10 +59,9 @@ async function refreshIdToken(refreshToken: string) {
     }
   } catch (err) {
     if (axios.isAxiosError(err)) {
-      return null;
+      throw new Error('Erro ao atualizar o token');
     } else {
-      return null; // Retorne null se não for possível atualizar o token
+      throw err;  // Alterado para lançar o erro capturado
     }
-    throw new Error('Erro ao atualizar o token');
   }
 }

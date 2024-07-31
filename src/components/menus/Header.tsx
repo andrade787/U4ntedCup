@@ -8,8 +8,6 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 import { Bell, Check, LogIn, LogOut, PlusCircle, User, X } from "lucide-react";
 import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-
 
 
 export default function Header() {
@@ -48,8 +46,7 @@ export default function Header() {
 
 
   const handleLogout = async () => {
-    await logout();
-    router.push('/login');
+    logout();
   };
 
   const MenuLinks = () => (

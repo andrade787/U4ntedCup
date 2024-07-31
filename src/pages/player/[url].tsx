@@ -151,7 +151,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   try {
-    const userDocRef = firestore.collection("users").where("url", "==", url).limit(1);
+    const userDocRef = firestore.collection("players").where("url", "==", url).limit(1);
     const userSnapshot = await userDocRef.get();
     if (userSnapshot.empty) {
       return {
@@ -165,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const userData = userDoc.data();
 
     const gameAccountsSnapshot = await firestore
-      .collection(`users/${userDoc.id}/game_account`)
+      .collection(`players/${userDoc.id}/game_account`)
       .get();
 
     const gameAccounts = gameAccountsSnapshot.empty

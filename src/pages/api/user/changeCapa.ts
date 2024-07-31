@@ -28,7 +28,9 @@ const imageSchema = z.object({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const uid = await verifyAndRefreshToken(req, res);
+    const VerifyToken = await verifyAndRefreshToken(req as any, res as any);
+    const uid = VerifyToken?.uid;
+
     if (!uid) {
       return res.status(401).json({ error: 'Não autorizado' });
     }
@@ -74,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           const newCapaUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 
-          const userRef = firestore.collection('users').doc(uid);
+          const userRef = firestore.collection('players').doc(uid);
           const userDoc = await userRef.get();
 
           if (!userDoc.exists) {
@@ -101,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       });
     } else if (req.method === 'DELETE') {
-      const userRef = firestore.collection('users').doc(uid);
+      const userRef = firestore.collection('players').doc(uid);
       const userDoc = await userRef.get();
 
       if (!userDoc.exists) {

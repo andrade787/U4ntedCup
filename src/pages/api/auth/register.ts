@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { firstname, assinaturaPlayer, email, nick, senha } = data;
     const formattedNick = nick.replace(/[^a-zA-Z0-9_]/g, "_").replace(/\s/g, "_");
 
-    const userQuerySnapshot = await firestore.collection('users').where('nick', '==', nick).get();
+    const userQuerySnapshot = await firestore.collection('players').where('nick', '==', nick).get();
 
     if (!userQuerySnapshot.empty) {
       return res.status(400).json({ error: "Já existe um usuário com esse nick" });
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       createdAt: Timestamp.now(), // Adiciona o campo createdAt
     };
 
-    await firestore.collection('users').doc(userRecord.uid).set(userData);
+    await firestore.collection('players').doc(userRecord.uid).set(userData);
 
     const customToken = await admin.auth().createCustomToken(userRecord.uid);
 

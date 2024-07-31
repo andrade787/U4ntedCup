@@ -1,15 +1,16 @@
-import { useState } from "react";
+// components/ConfiguracoesTime.tsx
+import { TeamInfos } from "@/lib/types";
 import { Switch } from "@/components/ui/switch";
-import { useTeam } from "@/context/TeamContext";
 
-export default function ConfiguracoesTime() {
-  const { team, updateTeam } = useTeam();
-  const [isPrivate, setIsPrivate] = useState(team.privacy === 'private');
+interface ConfiguracoesTimeProps {
+  localTeam: TeamInfos;
+  setLocalTeam: React.Dispatch<React.SetStateAction<TeamInfos>>;
+}
 
-  const handleSwitchChange = () => {
-    const newPrivacy = isPrivate ? 'public' : 'private';
-    setIsPrivate(!isPrivate);
-    updateTeam({ privacy: newPrivacy });
+export default function ConfiguracoesTime({ localTeam, setLocalTeam }: ConfiguracoesTimeProps) {
+
+  const handleSwitchChange = (checked: boolean) => {
+    setLocalTeam((prevTeam: TeamInfos) => ({ ...prevTeam, privacy: checked ? 'private' : 'public' }));
   };
 
   return (
@@ -21,7 +22,7 @@ export default function ConfiguracoesTime() {
             <h3 className="font-medium text-base">Só Convite</h3>
             <p className="text-sm text-zinc-300">Se ativado, outros players não podem solicitar para entrar no seu time, só você pode convidar.</p>
           </div>
-          <Switch checked={isPrivate} onCheckedChange={handleSwitchChange} />
+          <Switch checked={localTeam.privacy === 'private'} onCheckedChange={handleSwitchChange} />
         </div>
       </div>
     </div>

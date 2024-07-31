@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const token = await user.getIdToken();
     const refreshToken = user.refreshToken;
 
-    const userDocRef = doc(firestore, "users", user.uid);
+    const userDocRef = doc(firestore, "players", user.uid);
     const userDocSnap = await getDoc(userDocRef);
 
     if (!userDocSnap.exists()) {

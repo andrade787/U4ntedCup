@@ -10,7 +10,9 @@ const schema = z.object({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const uid = await verifyAndRefreshToken(req, res);
+    const VerifyToken = await verifyAndRefreshToken(req as any, res as any);
+    const uid = VerifyToken?.uid;
+
     if (!uid) {
       return res.status(401).json({ error: 'Não autorizado' });
     }
@@ -42,7 +44,7 @@ async function handleDelete(req: NextApiRequest, res: NextApiResponse, uid: stri
   }
 
   await firestore
-    .collection('users')
+    .collection('players')
     .doc(uid)
     .collection('game_account')
     .doc('Valorant')
@@ -62,7 +64,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse, uid: string)
 
   // Atualizar apenas o campo role no Firestore
   await firestore
-    .collection('users')
+    .collection('players')
     .doc(uid)
     .collection('game_account')
     .doc('Valorant')

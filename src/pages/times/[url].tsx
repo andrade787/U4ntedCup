@@ -10,25 +10,27 @@ import { GetServerSideProps } from "next";
 import { withUser } from "@/lib/auth";
 import { TeamProps } from "@/lib/types";
 import { useUser } from "@/context/UserContext";
-import { ComeIn } from "@/components/times/PaginaDoTime/comein";
-import { TeamProvider } from "@/context/TeamContext";
+import ComeIn from "@/components/times/PaginaDoTime/comein";
+import { TeamProvider, useTeam } from "@/context/TeamContext";
 import React from "react";
+import MyTeamPlayer from "@/components/times/PaginaDoTime/editartime/MyTeamPlayer";
 
 type TabType = 'players' | 'partidas' | 'campeonatos';
 
-
-const TimePage = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
+const TimePage = ({ user, team, ValueUrl }: TeamProps) => {
+  const [activeTab, setActiveTab] = useState<TabType>('players');
+  const [isReady, setIsReady] = useState(false);
+  const router = useRouter();
+  const { tab } = router.query;
   const { setUser } = useUser();
+  const { team_players } = useTeam();
+  const playerCount = Object.keys(team_players).length;
+
   useEffect(() => {
     if (user) {
       setUser(user);
     }
   }, [user, setUser]);
-
-  const router = useRouter();
-  const { tab } = router.query;
-  const [activeTab, setActiveTab] = useState<TabType>('players');
-  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const validTabs: TabType[] = ['players', 'partidas', 'campeonatos'];
@@ -37,8 +39,12 @@ const TimePage = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
   }, [tab]);
 
   const handleTabChange = (newTab: TabType) => {
+    if (!team?.url) {
+      return;
+    }
+
     router.push({
-      pathname: router.pathname,
+      pathname: `/times/${team.url}`,
       query: { tab: newTab },
     }, undefined, { shallow: true });
     setActiveTab(newTab);
@@ -63,18 +69,24 @@ const TimePage = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
             <div className="flex items-center flex-col justify-center">
               <h1 className="font-semibold text-3xl mb-1">{team.name}</h1>
               <div className="flex gap-2">
-                <p className="flex items-center gap-2"><Users size={16} /> {team.players.length} Players</p>
+                <p className="flex items-center gap-2"><Users size={16} />{playerCount} Players</p>
                 <p className="flex gap-2">| <ValorantIcon /></p>
               </div>
             </div>
             <div className="flex flex-col gap-3 mr-3">
-              {isOwner && <EditarTime />}
+
+              {user && user.uid == team.owner && <EditarTime />}
+
               <div className="flex flex-col gap-2 flex-1">
                 <div className="flex items-center justify-center gap-1 p-1 bg-zinc-800 rounded-xl">
                   {team.privacy === 'private' ? <LockKeyhole size={18} /> : <UnlockKeyhole size={18} />}
                   <h3>Time {team.privacy === 'private' ? 'Privado' : 'Público'}</h3>
                 </div>
-                {team.privacy !== 'private' && !isOwner && user && <ComeIn />}
+
+                {user && user.activeTeamId && user.uid !== team.owner && <MyTeamPlayer user={user} team={team} players={team_players} />}
+
+                {user && !user.activeTeamId && <ComeIn team={team} user={user} />}
+
               </div>
             </div>
           </div>
@@ -98,10 +110,10 @@ const TimePage = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
   );
 };
 
-const Team = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
+const Team = ({ user, team, team_players, ValueUrl }: TeamProps) => {
   return (
-    <TeamProvider user={user} team={team}>
-      <TimePage user={user} ValueUrl={ValueUrl} team={team} isOwner={isOwner} />
+    <TeamProvider user={user} team={team} team_players={team_players} >
+      <TimePage user={user} team={team} team_players={team_players} ValueUrl={ValueUrl} />
     </TeamProvider>
   );
 };
@@ -109,55 +121,80 @@ const Team = ({ user, team, ValueUrl, isOwner }: TeamProps) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params } = context;
   const user = await withUser(context);
+  console.log(user)
+  const url = params?.url;
 
-  if (!params?.url || typeof params.url !== 'string') {
-    const ValueUrl = params?.url;
+  if (!url || typeof url !== 'string') {
     return {
       props: {
-        ValueUrl,
+        ValueUrl: url || null,
         user,
         team: null,
-        isOwner: false,
+        players: [],
       },
     };
   }
 
   try {
-    const teamSnapshot = await firestore.collection('teams').where('url', '==', params.url).get();
+    const teamSnapshot = await firestore.collection('teams').where('url', '==', url).limit(1).get();
+
     if (teamSnapshot.empty) {
-      const ValueUrl = params?.url;
       return {
         props: {
-          ValueUrl,
+          ValueUrl: url,
           user,
           team: null,
-          isOwner: false,
+          players: [],
         },
       };
     }
 
-    const teamData = teamSnapshot.docs[0].data();
-    const isOwner = user && teamData.owner === user.uid;
 
-    console.log('teamData:', teamData);
+    const teamDoc = teamSnapshot.docs[0];
+    const teamData = teamDoc.data();
+    const serializedTeamData = {
+      ...teamData,
+      createdAt: teamData.createdAt ? teamData.createdAt.toDate().toISOString() : null,
+    };
 
+    const playersSnapshot = await teamDoc.ref.collection('players')
+      .where('status', '==', 'active')
+      .get();
+
+    const playersData = await Promise.all(playersSnapshot.docs.map(async playerDoc => {
+      const playerData = playerDoc.data();
+      const playerId = playerData.playerId;
+
+      const fullPlayerDoc = await firestore.collection('players').doc(playerId).get();
+      const fullPlayerData = fullPlayerDoc.data();
+
+      return {
+        ...fullPlayerData,
+        playerId: playerId,
+        createdAt: playerData.createdAt ? playerData.createdAt.toDate().toISOString() : null,
+        leaveDate: playerData.leaveDate ? playerData.leaveDate.toDate().toISOString() : null,
+        roles: playerData.roles,
+      };
+    }));
     return {
       props: {
         user,
-        team: teamData,
-        isOwner,
+        team: serializedTeamData,
+        team_players: playersData,
+        ValueUrl: url,
       },
     };
   } catch (error) {
+    console.error('Error fetching team data:', error);
+
     return {
       props: {
-        params,
+        ValueUrl: url,
         user,
         team: null,
-        isOwner: false,
+        players: [],
       },
     };
   }
 };
-
 export default React.memo(Team);

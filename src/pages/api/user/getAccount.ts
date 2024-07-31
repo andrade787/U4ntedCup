@@ -14,7 +14,9 @@ const schema = z.object({
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
-      const uid = await verifyAndRefreshToken(req, res);
+      const VerifyToken = await verifyAndRefreshToken(req as any, res as any);
+      const uid = VerifyToken?.uid;
+
       if (!uid) {
         return res.status(401).json({ error: 'Não autorizado' });
       }
@@ -73,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Salvar dados no Firestore
       await firestore
-        .collection('users')
+        .collection('players')
         .doc(uid)
         .collection('game_account')
         .doc('Valorant')

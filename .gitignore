@@ -12,6 +12,8 @@ out/
 
 # Production
 build/
+.bd
+.to-do
 
 # Misc
 .DS_Store

@@ -1,18 +1,15 @@
-// context/TeamContext.tsx
-import { createContext, useContext, useState } from "react";
-import { TeamContextProps, TeamProviderProps, TeamInfos } from "@/lib/types";
+import { createContext, useContext, useState, ReactNode } from "react";
+import { TeamContextProps, TeamProviderProps, TeamPlayers } from "@/lib/types";
 
 const TeamContext = createContext<TeamContextProps | undefined>(undefined);
 
-export const TeamProvider = ({ team, children, user }: TeamProviderProps) => {
-  const [currentTeam, setCurrentTeam] = useState<TeamInfos>(team);
+export const TeamProvider = ({ team, team_players: initialPlayers, children, user }: TeamProviderProps) => {
+  const [teamPlayers, setTeamPlayers] = useState<TeamPlayers[]>(initialPlayers);
 
-  const updateTeam = (updates: Partial<TeamInfos>) => {
-    setCurrentTeam((prevTeam) => ({ ...prevTeam, ...updates }));
-  };
+
 
   return (
-    <TeamContext.Provider value={{ team: currentTeam, user, updateTeam }}>
+    <TeamContext.Provider value={{ team, team_players: teamPlayers, user, setTeamPlayers }}>
       {children}
     </TeamContext.Provider>
   );

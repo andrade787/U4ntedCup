@@ -21,7 +21,6 @@ const schema = z.object({
 });
 
 const uploadLogo = async (file: formidable.File): Promise<string> => {
-  console.log('Iniciando upload do logo');
   const buffer = await sharp(file.filepath ?? '')
     .resize(200, 200)
     .webp()
@@ -36,7 +35,6 @@ const uploadLogo = async (file: formidable.File): Promise<string> => {
   });
 
   const logoUrl = `https://storage.googleapis.com/${storage.name}/${fileName}`;
-  console.log('Logo carregado com sucesso:', logoUrl);
   return logoUrl;
 };
 
@@ -47,86 +45,84 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log('Recebendo requisição', req.method, req.url);
+  const VerifyToken = await verifyAndRefreshToken(req as any, res as any);
+  const uid = VerifyToken?.uid;
+
+  if (!uid) {
+    return res.status(401).json({ error: 'Não autorizado' });
+  }
 
   const form = formidable();
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('Erro ao processar o formulário:', err);
       return res.status(500).json({ message: 'Erro ao processar o formulário' });
     }
-
-    console.log('Formulário processado com sucesso', { fields, files });
 
     const teamName = Array.isArray(fields.teamName) ? fields.teamName[0] : fields.teamName;
     const role = Array.isArray(fields.role) ? fields.role[0] : fields.role;
 
     if (!teamName) {
-      console.error('Nome do time inválido:', teamName);
       return res.status(400).json({ message: 'Nome do time inválido.' });
     }
     if (!role) {
-      console.error('Função inválida:', role);
       return res.status(400).json({ message: 'Função inválida.' });
     }
 
     const logoFile = Array.isArray(files.logo) ? files.logo[0] : files.logo;
     if (!logoFile) {
-      console.error('Logo do time é obrigatório');
       return res.status(400).json({ message: 'Logo do time é obrigatório.' });
     }
 
     const parsedData = schema.safeParse({ teamName, logo: logoFile, role });
     if (!parsedData.success) {
       const errors = parsedData.error.errors.map((error) => error.message);
-      console.error('Erro de validação:', errors);
       return res.status(400).json({ message: errors[0] });
     }
 
     try {
-      console.log('Verificando token do usuário');
-      const uid = await verifyAndRefreshToken(req, res);
-      if (!uid) {
-        console.error('Usuário não autorizado');
-        return res.status(401).json({ error: 'Não autorizado' });
-      }
-
-      console.log('Verificando se o usuário já possui um time');
-      const userTeamsSnapshot = await firestore.collection('Teams').where('owner', '==', uid).get();
+      const userTeamsSnapshot = await firestore.collection('teams').where('owner', '==', uid).get();
       if (!userTeamsSnapshot.empty) {
-        console.error('Usuário já possui um time criado');
         return res.status(400).json({ message: 'Você já possui um time criado.' });
       }
 
-      console.log('Verificando se já existe um time com este nome');
-      const existingTeamSnapshot = await firestore.collection('Teams').where('name', '==', teamName).get();
+      const existingTeamSnapshot = await firestore.collection('teams').where('name', '==', teamName).get();
       if (!existingTeamSnapshot.empty) {
-        console.error('Já existe um time com este nome');
         return res.status(400).json({ message: 'Já existe um time com este nome.' });
       }
 
-      console.log('Carregando logo do time');
       const logoUrl = await uploadLogo(logoFile);
 
       const teamId = nanoid();
       const teamUrl = teamName.replace(/[^a-zA-Z0-9_]/g, "_").replace(/\s/g, "_");
-      console.log('Criando time no Firestore:', { teamId, teamName, logoUrl, teamUrl, uid, role });
 
+      // Create the team document
       await firestore.collection('teams').doc(teamId).set({
-        owner: uid,
+        id: teamId,
         name: teamName,
         logo: logoUrl,
-        privacy: 'private',
         url: teamUrl,
-        players: [
-          {
-            playerId: uid,
-            roles: [role],
-          },
-        ],
+        privacy: 'private',
+        owner: uid,
       });
 
-      console.log('Time criado com sucesso:', teamUrl);
+      // Add player to the team's players subcollection
+      await firestore.collection('teams').doc(teamId).collection('players').doc(uid).set({
+        playerId: uid,
+        roles: [role],
+        createdAt: new Date(),
+        status: 'active',
+        leaveDate: null,
+      });
+
+      // Ensure the player document exists in the players collection
+      const playerDocRef = firestore.collection('players').doc(uid);
+      await playerDocRef.collection('teams').doc(teamId).set({
+        teamId: teamId,
+        joinedAt: new Date(),
+        status: 'active',
+        leftAt: null,
+      });
+
       return res.status(200).json({ url: teamUrl });
     } catch (error) {
       console.error('Erro ao criar time:', error);

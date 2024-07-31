@@ -57,7 +57,7 @@ export default function Cadastro({ user }: Props) {
                                     <Link href="/player/login"> <span className="text-Roxo hover:text-white">Fazer Login</span></Link>
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className='bg-zinc-900'>
                                 <hr className="mb-5"></hr>
                                 <FormCadastro />
                             </CardContent>

@@ -23,5 +23,6 @@ if (!admin.apps.length) {
 const firestore = admin.firestore();
 const auth = admin.auth();
 const storage = admin.storage().bucket();
+const realtimeDB = admin.database();
 
-export { firestore, auth, storage, admin };
+export { firestore, realtimeDB, auth, storage, admin };

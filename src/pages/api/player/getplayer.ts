@@ -12,8 +12,8 @@ type User = {
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
-      const snapshot = await firestore.collection('users').get();
-      const users: User[] = snapshot.docs.map(doc => {
+      const snapshot = await firestore.collection('players').get();
+      const players: User[] = snapshot.docs.map(doc => {
         const data = doc.data();
         return {
           capaUrl: data.capaUrl || '',
@@ -24,10 +24,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         };
       });
 
-      res.status(200).json(users);
+      res.status(200).json(players);
     } catch (error) {
-      console.error('Error fetching users:', error);
-      res.status(500).json({ error: 'Failed to fetch users' });
+      console.error('Error fetching players:', error);
+      res.status(500).json({ error: 'Failed to fetch players' });
     }
   } else {
     res.setHeader('Allow', ['POST']);

@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
     const comments = await Promise.all(commentsSnapshot.docs.map(async (doc) => {
       const commentData = doc.data() as Comment;
-      const userDoc = await firestore.collection('users').doc(commentData.UserComment).get();
+      const userDoc = await firestore.collection('players').doc(commentData.UserComment).get();
       const userData = userDoc.data() as User;
 
       // Construct the combined object ensuring no 'id' overwriting

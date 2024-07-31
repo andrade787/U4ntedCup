@@ -67,7 +67,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 <div className="absolute bottom-0 left-0 top-60 transform -translate-x-2/5 w-[500px] h-[700px] -z-10">
                   <Image
                     className='w-full'
-                    src='/assets/images/hero.png'
+                    src='/assets/images/hero.webp'
                     alt='imagem'
                     width={587}
                     height={900}
@@ -227,6 +227,7 @@ const HomePage = ({ user }: HomePageProps) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const user = await withUser(context);
+
   return {
     props: { user },
   };

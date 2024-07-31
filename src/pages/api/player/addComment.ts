@@ -22,7 +22,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  const uid = await verifyAndRefreshToken(req, res);
+  const VerifyToken = await verifyAndRefreshToken(req as any, res as any);
+  const uid = VerifyToken?.uid;
+
+
   if (!uid) {
     return res.status(401).json({ error: 'Não autorizado' });
   }
