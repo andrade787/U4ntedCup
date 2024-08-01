@@ -72,10 +72,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({
       user: {
         uid: user.uid,
-        email: user.email,
-        name: user.displayName,
-        photoURL: user.photoURL,
+        firstName: userData.firstName,
         nickname: userData.nickname,
+        email: user.email,
+        capaUrl: userData.capaUrl,
+        photoURL: userData.photoURL,
+        number: userData.number,
+        signaturePlayer: userData.signaturePlayer,
+        createdAt: userData.createdAt,
         url: userData.url,
       },
     });

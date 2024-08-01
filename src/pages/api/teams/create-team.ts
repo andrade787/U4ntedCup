@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
-import { firestore, storage } from '@/firebase/firebaseAdmin';
+import { firestore, storage, admin } from '@/firebase/firebaseAdmin';
 import formidable from 'formidable';
-import { nanoid } from 'nanoid';
 import sharp from 'sharp';
+import { nanoid } from 'nanoid';
 import { verifyAndRefreshToken } from '@/utils/verifytoken';
 
 const schema = z.object({
@@ -41,6 +41,7 @@ const uploadLogo = async (file: formidable.File): Promise<string> => {
 export const config = {
   api: {
     bodyParser: false,
+    externalResolver: true,
   },
 };
 
@@ -91,26 +92,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const logoUrl = await uploadLogo(logoFile);
-
-      const teamId = nanoid();
       const teamUrl = teamName.replace(/[^a-zA-Z0-9_]/g, "_").replace(/\s/g, "_");
 
-      // Create the team document
-      await firestore.collection('teams').doc(teamId).set({
+      const teamRef = firestore.collection('teams').doc();
+      const teamId = teamRef.id;
+
+      await teamRef.set({
         id: teamId,
         name: teamName,
         logo: logoUrl,
         url: teamUrl,
         privacy: 'private',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
         owner: uid,
       });
+
 
       // Add player to the team's players subcollection
       await firestore.collection('teams').doc(teamId).collection('players').doc(uid).set({
         playerId: uid,
         roles: [role],
-        createdAt: new Date(),
         status: 'active',
+        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
         leaveDate: null,
       });
 
@@ -118,9 +121,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const playerDocRef = firestore.collection('players').doc(uid);
       await playerDocRef.collection('teams').doc(teamId).set({
         teamId: teamId,
-        joinedAt: new Date(),
         status: 'active',
-        leftAt: null,
+        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+        leaveDate: null,
       });
 
       return res.status(200).json({ url: teamUrl });

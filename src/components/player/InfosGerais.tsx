@@ -17,7 +17,7 @@ const formSchema = z.object({
   nickname: z.string().min(1, { message: "Nick é obrigatório" }),
   email: z.string().email({ message: "Email inválido" }),
   assinaturaPlayer: z.string().min(1, { message: "Assinatura do Player é obrigatória" }),
-  photoURL: z.string().url({ message: "URL da foto é inválida" }).optional(),
+  photoURL: z.string().url({ message: "URL da foto é inválida" }).nullable().optional(),
 });
 
 export default function InfosGerais() {
@@ -77,6 +77,8 @@ export default function InfosGerais() {
       email: newEmail,
       assinaturaPlayer: newSubscription,
     };
+
+    console.log(updatedData)
 
     // Valida os dados usando o schema do Zod
     const result = formSchema.safeParse(updatedData);

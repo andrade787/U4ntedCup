@@ -1,15 +1,15 @@
-// pages/api/requests/[requestId].ts
+// pages/api/player/[requestId]/accept-invite.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 import { firestore, realtimeDB, admin } from '@/firebase/firebaseAdmin';
 import { verifyAndRefreshToken } from '@/utils/verifytoken';
 import { markNotificationAsRead } from '@/utils/markNotification';
 import { TeamPlayers } from '@/lib/types';
+
 const requestSchema = z.object({
   status: z.enum(['accepted', 'rejected']),
   notificationId: z.string(),
 });
-
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Request method:', req.method);
@@ -44,42 +44,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(403).json({ message: 'Unauthorized access to notification' });
       }
 
-      const senderId = notification.senderId;
+      const receiverId = notification.receiverId;
       const additionalInfo = notification.additionalInfo;
+      const teamId = notification.teamId;
 
       const playerRequestRef = firestore
         .collection('players')
-        .doc(senderId)
+        .doc(receiverId)
         .collection('requests')
         .doc(requestId as string);
       const playerRequestDoc = await playerRequestRef.get();
 
       // VALIDA SE O REQUEST EXISTE 
-      if (!playerRequestDoc.exists || additionalInfo[2] !== requestId) {
+      if (!playerRequestDoc.exists || additionalInfo[0] !== requestId) {
         return res.status(404).json({ message: 'Request not found' });
       }
 
       // Busca o nickname do player
-      const playerDoc = await firestore.collection('players').doc(senderId).get();
-      if (!playerDoc.exists) {
-        return res.status(404).json({ message: 'Player not found' });
+      const teamDoc = await firestore.collection('teams').doc(teamId).get();
+      if (!teamDoc.exists) {
+        return res.status(404).json({ message: 'Team not found' });
       }
-      const playerData = playerDoc.data();
-      const playerNick = playerData?.nickname;
+      const teamData = teamDoc.data();
+      const teamName = teamData?.name;
 
       let message;
-      let teamPlayer: TeamPlayers | null = null;
 
       if (status === 'accepted') {
-        const role = additionalInfo[0]; // PEGO A ROLE DO USUARIO QUE VAI SER SEMPRE O 0 do additionalInfo
+        const role = 'Controlador'; // DEFINO CONTROLADOR POR PADRAO POR ENQUANTO
+
         // ATUALIZA O REQUEST DO PLAYER 
         await playerRequestRef.update({
           status: 'accepted',
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        const teamId = notification.teamId;
-        // ADICIONA O TIME DO PLAYER QUE PEDIU PARA ENTRAR
-        const playerTeamRef = firestore.collection('players').doc(senderId).collection('teams').doc(teamId);
+
+        // ADICIONA O TIME DO PLAYER QUE ACEITOU
+        const playerTeamRef = firestore.collection('players').doc(receiverId).collection('teams').doc(teamId);
         await playerTeamRef.set({
           teamId,
           status: 'active',
@@ -88,31 +89,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         // ADICIONA O PLAYER NO TIME
-        const teamPlayerRef = firestore.collection('teams').doc(teamId).collection('players').doc(senderId);
+        const teamPlayerRef = firestore.collection('teams').doc(teamId).collection('players').doc(receiverId);
         await teamPlayerRef.set({
-          playerId: senderId,
+          playerId: receiverId,
           roles: [role],
           status: 'active',
           joinedAt: admin.firestore.FieldValue.serverTimestamp(),
           leaveDate: null,
         });
 
-        // envio os dados do player aceito
-        teamPlayer = {
-          signaturePlayer: playerData?.signaturePlayer,
-          playerId: senderId,
-          capaUrl: playerData?.capaUrl,
-          email: playerData?.email,
-          firstName: playerData?.firstName,
-          nickname: playerData?.nickname,
-          photoURL: playerData?.photoURL,
-          roles: [role],
-          url: playerData?.url,
-          joinedAt: new Date().toISOString(),
-          leaveDate: null,
-        };
-
-        message = `${playerNick} agora faz parte do seu time!`;
+        message = `Você agora faz parte do time ${teamName}.`;
       }
 
       if (status === 'rejected') {
@@ -121,14 +107,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           status: 'rejected',
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-
-        message = `Você recusou o pedido de ${playerNick} para entrar no seu time.`;
+        message = `Você recusou o pedido para entrar no time ${teamName}.`;
       }
-
 
       await markNotificationAsRead(notificationId, uid); // MARCA COMO VISTA A NOTIFICAO DE QUEM RECEBEU
 
-      res.status(200).json({ message, player: teamPlayer });
+      res.status(200).json({ message });
     } catch (error) {
       console.error('Error processing request:', error);
       let errorMessage = 'Internal server error';

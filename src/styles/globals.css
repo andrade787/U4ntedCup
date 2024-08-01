@@ -5,6 +5,7 @@
 
 
 
+
 @layer utilities {
   .custom-slider::-webkit-slider-thumb {
     @apply w-4 h-4 bg-zinc-300 rounded-full border-2 border-gray-700 cursor-pointer;

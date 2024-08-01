@@ -9,13 +9,13 @@ export interface activeTeam {
 }
 
 export interface Notification {
-  id: string;
+  notificationId: string;
   type: string;
   message: string;
   senderId: string;
   receiverId: string;
   teamId?: string;
-  additionalInfo?: string;
+  additionalInfo?: string[];
   isRead: boolean;
   createdAt: number;
 }
@@ -36,6 +36,9 @@ export interface User {
   url: string | null;
   token: string;
   activeTeamId: string | null;
+  urlTeam: string | null;
+  nameTeam: string | null;
+  logoTeam: string | null;
 }
 
 export interface PlayerData {
@@ -54,7 +57,6 @@ export interface PlayerData {
 export interface PlayerProps {
   playerData: PlayerData;
   user: User | null;
-  gameData?: any;
   isOwner?: boolean | null;
 }
 
@@ -73,13 +75,13 @@ export interface TeamPlayers {
   signaturePlayer: string;
   playerId: string;
   capaUrl: string | null;
-  createdAt: string;
   email: string;
   firstName: string;
   nickname: string;
   photoURL: string | null;
   roles: string[];
   url: string;
+  joinedAt: string;
   leaveDate: string | null;
 }
 

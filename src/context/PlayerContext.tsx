@@ -14,7 +14,6 @@ interface Comment {
 interface PlayerContextProps {
   isOwner: boolean;
   playerData: PlayerData;
-  gameData: any;
   comments: Comment[];
   setComments: (comments: Comment[]) => void;
   loading: boolean;
@@ -31,41 +30,11 @@ interface PlayerProviderProps {
 }
 
 export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, playerData, user }) => {
-  const [gameData, setGameData] = useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const tabRef = useRef<HTMLDivElement>(null);
   const isOwner = user && playerData && user.uid === playerData.id;
-
-  useEffect(() => {
-    async function fetchGameData() {
-      if (playerData?.gameAccounts && playerData.gameAccounts.Valorant) {
-        const valorantAccount = playerData.gameAccounts.Valorant;
-
-        const response = await fetch('/api/gameAccounts/v1/GetAccountValorant', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            region: 'br',
-            name: valorantAccount.nick,
-            tag: valorantAccount.tag,
-          }),
-        });
-
-        const data = await response.json();
-        setGameData(data);
-        setLoading(false);
-      } else {
-        setGameData(null);
-        setLoading(false);
-      }
-    }
-
-    fetchGameData();
-  }, [playerData?.gameAccounts]);
 
   const handleTabClick = useCallback((tab: string) => {
     router.replace({
@@ -80,7 +49,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, player
   }, [router]);
 
   return (
-    <PlayerContext.Provider value={{ isOwner, playerData, gameData, comments, setComments, loading, handleTabClick, tabRef }}>
+    <PlayerContext.Provider value={{ isOwner, playerData, comments, setComments, loading, handleTabClick, tabRef }}>
       {children}
     </PlayerContext.Provider>
   );

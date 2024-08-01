@@ -27,11 +27,11 @@ const PlayerPageContent = ({ user }: Props) => {
   const router = useRouter();
   const activeTab = router.query.tab as string || 'informacoes';
   const initialName = playerData?.nickname.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
-
+  console.log(playerData)
   useEffect(() => {
-    console.log(user)
     if (user) {
       setUser(user);
+      console.log(user)
     }
   }, [user, setUser]);
 
@@ -56,9 +56,9 @@ const PlayerPageContent = ({ user }: Props) => {
                 <div className="absolute z-10 inset-0 from-zinc-900 bg-gradient-to-r rounded-lg"></div>
               }
               <div className='flex items-center gap-5 w-full z-20'>
-                <Avatar className='w-48 h-48'>
+                <Avatar className='w-48 h-48 '>
                   <AvatarImage className='w-full object-cover' src={playerData.photoURL} />
-                  <AvatarFallback>{initialName}</AvatarFallback>
+                  <AvatarFallback className='bg-zinc-900/70 text-6xl font-semibold'>{initialName}</AvatarFallback>
                 </Avatar>
                 <div className='flex justify-between items-center w-full'>
                   <div>
@@ -114,7 +114,7 @@ const PlayerPageContent = ({ user }: Props) => {
           <div className='flex flex-1 flex-col'>
             <div ref={tabRef}>
               {activeTab === 'informacoes' && (
-                <Informacoes />
+                <Informacoes user={user} />
               )}
               {activeTab === 'partidas' && (
                 <Partidas />
@@ -171,9 +171,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const gameAccounts = gameAccountsSnapshot.empty
       ? null
       : gameAccountsSnapshot.docs.reduce((acc, doc) => {
-        acc[doc.id] = doc.data();
+        const data = doc.data();
+        if (data.last_update) {
+          data.last_update = data.last_update.toDate().toISOString();
+        }
+        acc[doc.id] = data;
         return acc;
       }, {} as { [key: string]: any });
+
 
     return {
       props: {
@@ -184,8 +189,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           photoURL: userData.photoURL || null,
           nickname: userData.nickname || "Sem NickName",
           url: userData.url || null,
-          cs2: userData.cs2 !== undefined ? userData.cs2 : false,
-          valorant: userData.valorant !== undefined ? userData.valorant : false,
           capaUrl: userData.capaUrl || null,
           assinaturaPlayer: userData.assinaturaPlayer || null,
           gameAccounts,

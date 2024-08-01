@@ -29,6 +29,7 @@ export async function sendNotification(notificationData: NotificationData) {
   const notificationsRef = realtimeDB.ref(`notifications/${receiverId}`).push();
 
   await notificationsRef.set({
+    notificationId: notificationsRef.key,
     type,
     isRead: false,
     message,
@@ -37,6 +38,7 @@ export async function sendNotification(notificationData: NotificationData) {
     teamId,
     additionalInfo,
     createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
 
   return { message: 'Notification sent successfully' };

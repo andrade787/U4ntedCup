@@ -13,13 +13,14 @@ import { useUser } from "@/context/UserContext";
 
 const formSchema = z.object({
     firstname: z.string().min(2, { message: "Deve conter no mínimo 2 caracteres" }),
-    assinaturaPlayer: z.string().min(2, { message: "Deve conter no mínimo 2 caracteres" }).max(32, { message: "A assinatura não pode ter mais de 32 caracteres" }),
     email: z.string().email(),
     nick: z.string().min(2, { message: "Deve conter no mínimo 2 caracteres" }),
     senha: z.string().min(6, {
         message: "A senha deve ter pelo menos 6 caracteres.",
     }),
     confirmsenha: z.string(),
+    number: z.string().min(9, { message: "O número deve conter no mínimo 9 caracteres" }),
+
 }).refine(data => data.senha === data.confirmsenha, {
     message: "As senhas não coincidem!",
 });
@@ -27,16 +28,28 @@ const formSchema = z.object({
 export default function FormCadastro() {
     const { toast } = useToast();
     const router = useRouter();
-    const { setUser } = useUser(); // Usar a função setUser do contexto
+    const { setUser } = useUser();
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+    const formatAndLimitPhoneNumber = (number: string) => {
+        const cleaned = ('' + number).replace(/\D/g, '').slice(0, 11); // Limita o número a 11 dígitos
+        const match = cleaned.match(/^(\d{2})(\d{1})(\d{4})(\d{4})$/);
+        if (match) {
+            return `( ${match[1]} ) ${match[2]} ${match[3]}-${match[4]}`;
+        }
+        return cleaned;
+    };
+
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             firstname: "",
-            assinaturaPlayer: "",
             email: "",
             nick: "",
             senha: "",
+            number: "",
             confirmsenha: "",
         },
     });
@@ -51,7 +64,7 @@ export default function FormCadastro() {
             });
 
             const result = await response.json();
-
+            console.log(result)
             if (!response.ok) {
                 throw new Error(result.error);
             }
@@ -66,14 +79,7 @@ export default function FormCadastro() {
             const formattedNick = data.nick.replace(/[^a-zA-Z0-9_]/g, "_").replace(/\s/g, "_");
 
             // Definir o usuário no contexto
-            setUser({
-                uid: result.uid,
-                email: data.email,
-                name: data.firstname,
-                photoURL: null,
-                nickname: data.nick,
-                url: formattedNick,
-            });
+            setUser(result.userData);
 
             router.push(`/player/${formattedNick}`);
 
@@ -99,7 +105,7 @@ export default function FormCadastro() {
     return (
         <Form {...form} >
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-                <div className="flex gap-4">
+                <div className="grid grid-cols-2 space-x-4">
                     <FormField
                         control={form.control}
                         name="firstname"
@@ -108,34 +114,6 @@ export default function FormCadastro() {
                                 <FormLabel>Seu Nome</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Seu Primeiro Nome" {...field} />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="assinaturaPlayer"
-                        render={({ field }) => (
-                            <FormItem className="flex-1">
-                                <FormLabel>Sua Assinatura</FormLabel>
-                                <FormControl>
-                                    <Input maxLength={32} placeholder="Exemplo: eu sou o milior" {...field} />
-                                </FormControl>
-                                <FormMessage className="text-red-500" />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                <div className="flex space-x-4">
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem className="flex-1">
-                                <FormLabel>Seu Email</FormLabel>
-                                <FormControl>
-                                    <Input type="email" placeholder="Informe um Email" {...field} />
                                 </FormControl>
                             </FormItem>
                         )}
@@ -153,6 +131,41 @@ export default function FormCadastro() {
                         )}
                     />
                 </div>
+
+                <div className="grid grid-cols-2 space-x-4">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Seu Email</FormLabel>
+                                <FormControl>
+                                    <Input type="email" placeholder="Informe um Email" {...field} />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="number"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Seu Número</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Seu número"
+                                        {...field}
+                                        value={field.value ? formatAndLimitPhoneNumber(field.value) : ''}
+                                        onChange={(e) => field.onChange((e.target.value.replace(/\D/g, '').slice(0, 11)))}
+                                    />
+                                </FormControl>
+                                <FormMessage className="text-red-500" />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+
 
                 <FormField
                     control={form.control}

@@ -1,52 +1,47 @@
+// CardPlayerInvite.tsx
 import Image from 'next/image';
 import { Check, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useUser } from '@/context/UserContext';
+import { useTeam } from '@/context/TeamContext';
 import { Notification } from '@/lib/types';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function CardPlayerInvite() {
   const { notifications } = useUser();
   const { toast } = useToast();
+  const { setTeamPlayers } = useTeam();
 
   const updateRequestStatus = async (notification: Notification, status: string) => {
     try {
-
-      const Role = notification.additionalInfo?.[0];
-      const playerNick = notification.additionalInfo?.[1];
-      const requestId = notification.additionalInfo?.[2];
-      const notificationId = notification.id;
-      const receiverId = notification.receiverId;
-
-      const response = await fetch(`/api/teams/requests/${requestId}`, {
+      const response = await fetch(`/api/teams/requests/${notification.additionalInfo?.[2]}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           status,
-          notificationId,
-          receiverId,
-          Role,
-          playerId: notification.senderId,
-          playerNick,
-          teamId: notification.teamId,
+          notificationId: notification.notificationId,
         }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to update request');
       }
-
       const data = await response.json();
+
+      if (status === 'accepted' && data.player) {
+        setTeamPlayers((prevPlayers) => [...prevPlayers, data.player]);
+      }
+
       toast({
         title: `Você ${status === 'accepted' ? 'aceitou' : 'recusou'} o pedido!`,
         description: data.message,
         variant: `${status === 'accepted' ? 'success' : 'destructive'}`,
       });
     } catch (error) {
-      let errorMessage = 'Ocorreu um erro ao atualizar o pedido.';
+      let errorMessage = 'Ocorreu um erro. Tente novamente mais';
       if (error instanceof Error) {
         errorMessage = error.message;
       }

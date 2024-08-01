@@ -4,6 +4,8 @@ import axios from "axios";
 import JoinTeam from "./JoinTeam";
 import StatusComein from "./StatusComein";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUser } from "@/context/UserContext";
+import TeamInvite from "./TeamInvite";
 
 interface ComeInProps {
   team: TeamInfos;
@@ -29,9 +31,10 @@ export default function ComeIn({ team, user }: ComeInProps) {
         setLoading(false);
       }
     };
-
     checkInvitation();
   }, [team.id, user.uid]);
+
+
 
   if (loading) {
     return (

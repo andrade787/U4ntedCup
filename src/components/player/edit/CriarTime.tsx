@@ -21,7 +21,7 @@ const schema = z.object({
   }).refine((file) => ["image/webp", "image/png", "image/jpg", "image/jpeg"].includes(file.type), {
     message: "Formato de arquivo não suportado. Use webp, png, jpg ou jpeg"
   }),
-  role: z.string().nonempty({ message: "A função é obrigatória" })
+  role: z.string().min(1, { message: "A função é obrigatória" })
 });
 
 export default function CriarTime() {

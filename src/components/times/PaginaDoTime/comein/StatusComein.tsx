@@ -1,5 +1,6 @@
 import { DropdownMenuGroup, DropdownMenuSeparator, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { ChevronDown, MailQuestion, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
+import TeamInvite from "./TeamInvite";
 
 interface StatusComeinProps {
   status: string;
@@ -32,14 +33,7 @@ export default function StatusComein({ status, type }: StatusComeinProps) {
 
   if (type === 'team_invite') {
     return (
-      <div className="bg-Roxo flex flex-col items-center text-white p-4 rounded-xl animate-in slide-in-from-right-14">
-        <MailQuestion />
-        <h3 className="text-center">Você foi convidado para entrar nesse time</h3>
-        <div className="flex items-center gap-8 mt-1">
-          <span className="bg-zinc-800/60 rounded-xl py-1 px-2 cursor-pointer hover:bg-zinc-800/80 transition-colors">Aceitar</span>
-          <span className="bg-zinc-800/30 rounded-xl py-1 px-2 cursor-pointer hover:bg-zinc-800/80 transition-colors">Rejeitar</span>
-        </div>
-      </div>
+      <TeamInvite />
     );
   }
 

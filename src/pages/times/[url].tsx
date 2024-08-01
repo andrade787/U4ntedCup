@@ -24,7 +24,13 @@ const TimePage = ({ user, team, ValueUrl }: TeamProps) => {
   const { tab } = router.query;
   const { setUser } = useUser();
   const { team_players } = useTeam();
-  const playerCount = Object.keys(team_players).length;
+
+
+  let playerCount = null;
+
+  if (team_players) {
+    playerCount = Object.keys(team_players).length;
+  }
 
   useEffect(() => {
     if (user) {
@@ -85,7 +91,9 @@ const TimePage = ({ user, team, ValueUrl }: TeamProps) => {
 
                 {user && user.activeTeamId && user.uid !== team.owner && <MyTeamPlayer user={user} team={team} players={team_players} />}
 
-                {user && !user.activeTeamId && <ComeIn team={team} user={user} />}
+
+
+                {user && playerCount && !user.activeTeamId && team.privacy == 'public' && playerCount < 6 && <ComeIn team={team} user={user} />}
 
               </div>
             </div>
@@ -99,7 +107,7 @@ const TimePage = ({ user, team, ValueUrl }: TeamProps) => {
               </div>
             </div>
 
-            {activeTab === 'players' && <PlayersDoTime />}
+            {activeTab === 'players' && <PlayersDoTime team_players={team_players} user={user} team={team} />}
             {activeTab === 'partidas' && <PartidasDoTime />}
             {activeTab === 'campeonatos' && <CampeonatosDoTime />}
 
@@ -121,7 +129,6 @@ const Team = ({ user, team, team_players, ValueUrl }: TeamProps) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params } = context;
   const user = await withUser(context);
-  console.log(user)
   const url = params?.url;
 
   if (!url || typeof url !== 'string') {
@@ -149,7 +156,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
 
-
     const teamDoc = teamSnapshot.docs[0];
     const teamData = teamDoc.data();
     const serializedTeamData = {
@@ -167,15 +173,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
       const fullPlayerDoc = await firestore.collection('players').doc(playerId).get();
       const fullPlayerData = fullPlayerDoc.data();
-
       return {
         ...fullPlayerData,
         playerId: playerId,
-        createdAt: playerData.createdAt ? playerData.createdAt.toDate().toISOString() : null,
+        joinedAt: playerData.joinedAt ? playerData.joinedAt.toDate().toISOString() : null,
         leaveDate: playerData.leaveDate ? playerData.leaveDate.toDate().toISOString() : null,
+        createdAt: fullPlayerData?.createdAt ? fullPlayerData.createdAt.toDate().toISOString() : null,
         roles: playerData.roles,
       };
     }));
+
     return {
       props: {
         user,

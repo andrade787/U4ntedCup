@@ -21,7 +21,7 @@ const formSchema = z.object({
   assinaturaPlayer: z.string()
     .min(1, { message: "Assinatura do Player é obrigatória" })
     .max(32, { message: "Assinatura do Player não pode ter mais de 32 caracteres" }),
-  photoURL: z.string().optional(),
+  photoURL: z.string().nullable().optional(),
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

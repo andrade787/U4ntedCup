@@ -1,10 +1,15 @@
+import { TeamInfos, TeamPlayers, User } from "@/lib/types";
 import { AddPlayerTime } from "../Players/AddPlayer/AddPlayer";
 import CardPlayerInvite from "../Players/CardPlayerInvite";
 import CardPlayers from "../Players/CardPlayers";
-import { useTeam } from "@/context/TeamContext";
 
-export default function PlayersDoTime() {
-  const { team_players, user, team } = useTeam();
+interface PlayersDoTimeProps {
+  team_players: TeamPlayers[];
+  user: User;
+  team: TeamInfos;
+}
+
+export default function PlayersDoTime({ team_players, user, team }: PlayersDoTimeProps) {
   let IsOwner = null;
   if (user && team.owner === user.uid) {
     IsOwner = user.uid;
@@ -17,7 +22,7 @@ export default function PlayersDoTime() {
   const remainingPlayers = team_players.filter(player => player.playerId !== team.owner && player.playerId !== user?.uid);
 
   // Ordenar os jogadores restantes pela data de criação (mais antigos primeiro)
-  remainingPlayers.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  remainingPlayers.sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime());
 
   // Inserir o dono do time na primeira posição
   const orderedPlayers = [];
@@ -44,10 +49,10 @@ export default function PlayersDoTime() {
           <h2 className='text-2xl font-semibold'>Players do time</h2>
           <p className='text-sm text-zinc-300'>Confira todos os jogadores do time</p>
         </div>
-        {IsOwner && <AddPlayerTime />}
+        {IsOwner && <AddPlayerTime team_players={team_players} user={user} team={team} />}
       </div>
       <div className="space-y-4 animate-in zoom-in">
-        {IsOwner && <CardPlayerInvite />}
+        {IsOwner && team.privacy == 'public' && <CardPlayerInvite />}
         <div className='space-y-5'>
           {orderedPlayers.length > 0 ? (
             orderedPlayers.map((player) => (

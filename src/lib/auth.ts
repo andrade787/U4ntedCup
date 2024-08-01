@@ -13,23 +13,31 @@ export const withUser = async (context: GetServerSidePropsContext) => {
       return null;
     }
 
-    const user = await admin.auth().getUser(uid);
+    const [user, userDocSnap] = await Promise.all([
+      admin.auth().getUser(uid),
+      firestore.collection('players').doc(uid).get()
+    ]);
 
-    const userDocRef = firestore.collection('players').doc(user.uid);
-    const userDocSnap = await userDocRef.get();
     const userData = userDocSnap.exists ? userDocSnap.data() : {};
 
-    // Verificar a sub-coleção teams para o status active
-    const teamsCollectionRef = userDocRef.collection('teams');
-    const activeTeamsQuerySnap = await teamsCollectionRef.where('status', '==', 'active').limit(1).get();
+    // vejo se o usuario tem um time ou nao e crio um token personalizado
+    const [activeTeamsQuerySnap, customToken] = await Promise.all([
+      firestore.collection('players').doc(uid).collection('teams').where('status', '==', 'active').limit(1).get(),
+      admin.auth().createCustomToken(uid)
+    ]);
 
-    let activeTeamId = null;
+
+    let activeTeamData = null;
     if (!activeTeamsQuerySnap.empty) {
       const activeTeamDoc = activeTeamsQuerySnap.docs[0];
-      activeTeamId = activeTeamDoc.data().teamId;
-    }
+      const teamId = activeTeamDoc.id;
 
-    const customToken = await admin.auth().createCustomToken(uid);
+      const teamDocSnap = await firestore.collection('teams').doc(teamId).get();
+
+      if (teamDocSnap.exists) {
+        activeTeamData = teamDocSnap.data();
+      }
+    }
 
     return {
       uid: user.uid,
@@ -39,10 +47,13 @@ export const withUser = async (context: GetServerSidePropsContext) => {
       nickname: userData?.nickname || null,
       url: userData?.url || null,
       token: customToken,
-      activeTeamId: activeTeamId,
+      activeTeamId: activeTeamData?.id || null,
+      urlTeam: activeTeamData?.url || null,
+      nameTeam: activeTeamData?.name || null,
+      logoTeam: activeTeamData?.logo || null,
     };
   } catch (error) {
-    console.log('Error verifying or refreshing token: ', error);
+    console.error('Error verifying or refreshing token: ', error);
     return null;
   }
 };

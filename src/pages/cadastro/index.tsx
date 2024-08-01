@@ -54,7 +54,7 @@ export default function Cadastro({ user }: Props) {
                             <CardHeader>
                                 <CardTitle className="text-center">Formulário de Inscrição</CardTitle>
                                 <CardDescription className="text-center">Já possui uma conta?
-                                    <Link href="/player/login"> <span className="text-Roxo hover:text-white">Fazer Login</span></Link>
+                                    <Link href="/login"> <span className="text-Roxo hover:text-white">Fazer Login</span></Link>
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className='bg-zinc-900'>

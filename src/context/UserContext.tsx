@@ -25,9 +25,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const data = snapshot.val();
       const newNotifications: Notification[] = Object.keys(data)
         .map((key) => ({ ...data[key], id: key }))
-        .filter((notification) => !notification.isRead); // filter only unread messages
+        .filter((notification) => !notification.isRead);
 
       setNotifications(newNotifications);
+      console.log(notifications)
     } else {
       setNotifications([]);
     }
@@ -41,7 +42,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       return () => {
         if (notificationRef.current) {
           off(notificationRef.current, 'value', handleValueChange);
-          console.log(notifications)
+
         }
       };
     }

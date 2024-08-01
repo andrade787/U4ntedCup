@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { verifyAndRefreshToken } from '@/utils/verifytoken';
 import * as z from 'zod';
-import { firestore } from '@/firebase/firebaseAdmin'; // Certifique-se de ajustar o caminho conforme necessário
-import * as admin from 'firebase-admin';
+import { admin, firestore } from '@/firebase/firebaseAdmin'; // Certifique-se de ajustar o caminho conforme necessário
 
 // Definindo o esquema de validação com zod
 const schema = z.object({
@@ -28,25 +27,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const { name, tag, role } = result.data;
-      const apiUrl = `https://api.henrikdev.xyz/valorant/v1/account/${name}/${tag}`;
-      const response = await fetch(apiUrl, {
+      const accountApiUrl = `https://api.henrikdev.xyz/valorant/v1/account/${name}/${tag}`;
+      const accountResponse = await fetch(accountApiUrl, {
         method: 'GET',
         headers: {
           'Authorization': `${process.env.VALORANT_API_TOKEN}`
         },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
+      if (!accountResponse.ok) {
+        const errorText = await accountResponse.text();
         let errorData;
         try {
           errorData = JSON.parse(errorText);
         } catch {
-          return res.status(response.status).json({ error: 'A API do Valorant está instável no momento. Por favor, tente novamente mais tarde!' });
+          return res.status(accountResponse.status).json({ error: 'A API OFICIAL do Valorant está instável no momento. Por favor, tente novamente mais tarde!' });
         }
 
         const error = errorData.errors ? errorData.errors[0] : null;
-        switch (error ? error.status : response.status) {
+        if (error && error.status === 404 && error.message === "Error while fetching needed match data to get players account level and more data") {
+          return res.status(404).json({ error: 'Para adicionar sua conta, é necessário ter jogado pelo menos uma partida nos últimos 1-2 meses.' });
+        }
+
+        switch (error ? error.status : accountResponse.status) {
           case 400:
             return res.status(400).json({ error: 'Solicitação inválida' });
           case 403:
@@ -64,14 +67,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           case 503:
             return res.status(503).json({ error: 'API do valorant indisponível. Por favor, tente novamente mais tarde!' });
           default:
-            return res.status(response.status).json({ error: error ? error.message : 'Erro desconhecido' });
+            return res.status(accountResponse.status).json({ error: error ? error.message : 'A API OFICIAL do Valorant está instável no momento. Por favor, tente novamente mais tarde!' });
         }
       }
 
-      const data = await response.json();
+      const accountData = await accountResponse.json();
+      const { puuid, region, name: accountName, tag: accountTag, card } = accountData.data;
 
-      // Extraindo os dados necessários da resposta
-      const { puuid, name: accountName, tag: accountTag } = data.data;
+      const mmrApiUrl = `https://api.henrikdev.xyz/valorant/v2/by-puuid/mmr/${region}/${puuid}`;
+      const mmrResponse = await fetch(mmrApiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `${process.env.VALORANT_API_TOKEN}`
+        },
+      });
+
+      if (!mmrResponse.ok) {
+        return res.status(mmrResponse.status).json({ error: 'Erro ao obter os dados de MMR. Por favor, tente novamente mais tarde!' });
+      }
+
+      const mmrData = await mmrResponse.json();
+      const { current_data, highest_rank, by_season } = mmrData.data;
+      const { images, currenttierpatched: current_tier } = current_data;
+
+      // Encontrar a season mais recente em que o usuário jogou
+      let recentSeasonData = null;
+      let recentSeason = null;
+      const seasons = Object.keys(by_season).sort().reverse(); // Ordena as seasons de forma decrescente
+      for (const season of seasons) {
+        const seasonData = by_season[season];
+        if (seasonData.wins > 0 && seasonData.number_of_games > 0) {
+          recentSeason = season;
+          recentSeasonData = {
+            wins: seasonData.wins,
+            number_of_games: seasonData.number_of_games
+          };
+          break;
+        }
+      }
 
       // Salvar dados no Firestore
       await firestore
@@ -81,12 +114,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .doc('Valorant')
         .set({
           puuid,
+          region,
           nick: accountName,
           tag: accountTag,
           role,
+          card: card.large,
+          current_tier,
+          current_tier_image: images.large,
+          current_tier_triangle_up: images.triangle_up,
+          highest_rank_tier: highest_rank.tier,
+          highest_rank_patched_tier: highest_rank.patched_tier,
+          highest_rank_season: highest_rank.season,
+          recent_season: recentSeason,
+          recent_season_wins: recentSeasonData?.wins || null,
+          recent_season_number_of_games: recentSeasonData?.number_of_games || null,
+          last_update: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-      return res.status(200).json(data);
+      return res.status(200).json({ accountData, mmrData });
     } catch (error) {
       // Verificar se o erro é uma instância de Error
       if (error instanceof Error) {

@@ -56,7 +56,7 @@ export default function MyTeamPlayer({ user, team, players }: MyTeamPlayerProps)
           </div>
           <div className="grid grid-cols-3">
             <h3 className="flex col-span-1 text-sm">Ingressou em</h3>
-            {user_player?.createdAt && <p className="col-span-2 text-zinc-400 text-sm">{format(new Date(user_player.createdAt), "dd/MM/yyyy 'às' HH:mm'H'", { locale: ptBR })}</p>}
+            {user_player?.joinedAt && <p className="col-span-2 text-zinc-400 text-sm">{format(new Date(user_player.joinedAt), "dd/MM/yyyy 'às' HH:mm'H'", { locale: ptBR })}</p>}
           </div>
 
         </DialogContent>

@@ -1,17 +1,19 @@
 // pages/api/register.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { admin, firestore } from "@/firebase/firebaseAdmin";
+import { auth } from "@/firebase/firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { z, ZodError } from "zod";
-import { Timestamp } from "firebase-admin/firestore";
+import cookie from "cookie";
 
 const registerSchema = z.object({
   firstname: z.string().min(2, { message: "Deve conter no mínimo 2 caracteres" }),
-  assinaturaPlayer: z.string().min(2, { message: "Deve conter no mínimo 2 caracteres" }).max(32, { message: "A assinatura não pode ter mais de 32 caracteres" }),
   email: z.string().email(),
   nick: z.string().min(2, { message: "Deve conter no mínimo 2 caracteres" }),
   senha: z.string().min(6, {
     message: "A senha deve ter pelo menos 6 caracteres.",
   }),
+  number: z.string().min(10, { message: "Deve conter no mínimo 10 caracteres" }),
   confirmsenha: z.string(),
 }).refine(data => data.senha === data.confirmsenha, {
   message: "As senhas não coincidem!",
@@ -24,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const data = registerSchema.parse(req.body);
-    const { firstname, assinaturaPlayer, email, nick, senha } = data;
+    const { firstname, email, number, nick, senha } = data;
     const formattedNick = nick.replace(/[^a-zA-Z0-9_]/g, "_").replace(/\s/g, "_");
 
     const userQuerySnapshot = await firestore.collection('players').where('nick', '==', nick).get();
@@ -40,19 +42,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const userData = {
+      uid: userRecord.uid,
       firstName: firstname,
-      assinaturaPlayer,
-      email,
       nickname: nick,
+      email,
+      capaUrl: null,
+      photoURL: null,
+      number,
+      assinaturaPlayer: 'eu sou o milhor',
       url: formattedNick,
-      createdAt: Timestamp.now(), // Adiciona o campo createdAt
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     await firestore.collection('players').doc(userRecord.uid).set(userData);
 
-    const customToken = await admin.auth().createCustomToken(userRecord.uid);
 
-    res.status(201).json({ token: customToken });
+    const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+    const refreshToken = user.refreshToken;
+
+    res.setHeader("Set-Cookie", [
+      cookie.serialize("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        maxAge: 60 * 60 * 24 * 15,
+        sameSite: "strict",
+        path: "/",
+      }),
+      cookie.serialize("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        maxAge: 60 * 60 * 24 * 15,
+        sameSite: "strict",
+        path: "/",
+      })
+    ]);
+
+
+
+    res.status(200).json(userData);
 
   } catch (error) {
     if (error instanceof ZodError) {
@@ -72,7 +101,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    // Para qualquer outro tipo de erro
     return res.status(500).json({ error: (error as Error).message });
   }
 }

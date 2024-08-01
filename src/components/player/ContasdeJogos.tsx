@@ -1,32 +1,17 @@
 import React from "react";
 import { AlertCircle, Award, Frown, Gamepad2 } from "lucide-react";
 import { EditContasdeJogos } from "./edit/EditContasdeJogos";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AddConta } from "./edit/AddConta";
 import { ValorantIcon } from "../icons";
 import { usePlayer } from '@/context/PlayerContext';
 import Image from "next/image";
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+
 
 const ContasDeJogos = () => {
-  const { playerData, gameData, isOwner, loading } = usePlayer();
+  const { playerData, isOwner } = usePlayer();
   const valorantAccount = playerData?.gameAccounts?.Valorant;
-
-  if (loading) {
-    return (
-      <Skeleton className="h-40 w-full flex gap-4 rounded-xl">
-        <Skeleton className="rounded-l-xl rounded-r-none w-40 h-40 bg-zinc-700" />
-        <div className="flex flex-col p-3">
-          <Skeleton className="rounded-l-xl w-48 h-8 mb-2 bg-zinc-700" />
-          <div className="flex flex-col space-y-2">
-            <Skeleton className="rounded-l-xl w-40 h-5 bg-zinc-700" />
-            <Skeleton className="rounded-l-xl w-40 h-5 bg-zinc-700" />
-            <Skeleton className="rounded-l-xl w-40 h-5 bg-zinc-700" />
-            <Skeleton className="rounded-l-xl w-20 h-3 bg-zinc-700" />
-          </div>
-        </div>
-      </Skeleton>
-    );
-  }
 
   return (
     <>
@@ -35,33 +20,33 @@ const ContasDeJogos = () => {
           <div className='flex items-center gap-4'>
             <Image
               className="rounded-l-xl w-40 h-40 object-cover object-top animate-in fade-in"
-              src={gameData?.card?.large || ''}
+              src={valorantAccount.card || ''}
               alt="Player Card"
               width={160}
               height={160} />
             <div className='flex flex-col p-3'>
               <h2 className='font-semibold text-2xl mb-1 animate-in fade-in-20'>
-                {valorantAccount?.nick || ''} #{valorantAccount?.tag || ''}
+                {valorantAccount.nick || ''} #{valorantAccount.tag || ''}
               </h2>
               <div className="flex flex-col space-y-1 animate-in fade-in-40">
                 <p className='font-normal text-base flex items-center gap-2'>
                   <Image
                     className="w-6 h-6"
-                    src="https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/18/smallicon.png"
+                    src={valorantAccount.current_tier_image}
                     alt="Tier Icon"
                     width={24}
                     height={24}
                   />
-                  {gameData?.currenttier_patched || 'N/A'}
+                  {valorantAccount.current_tier || 'N/A'}
                 </p>
                 <p className='font-normal text-base flex items-center gap-2'>
-                  <Gamepad2 /> {gameData?.season?.number_of_games || 0} Partidas
+                  <Gamepad2 /> {valorantAccount.recent_season_number_of_games || 0} Partidas
                 </p>
                 <p className='font-normal text-base flex items-center gap-2'>
-                  <Award /> {gameData?.season?.wins || 0} Vitórias
+                  <Award /> {valorantAccount.recent_season_wins || 0} Vitórias
                 </p>
                 <p className='font-normal text-xs text-zinc-300'>
-                  Season {gameData?.season?.season_name || 'N/A'}
+                  Season {valorantAccount.recent_season || 'N/A'} | Última Atualização: {format(new Date(valorantAccount.last_update), "dd/MM/yyyy 'às' HH:mm'H'", { locale: ptBR })}
                 </p>
               </div>
             </div>

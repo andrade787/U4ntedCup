@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: 'O time não é público' });
     }
 
-    const playerData = await getPlayerData(playerId);
+    const playerData = await getPlayerData(playerId); // valido se o jogador existe
     if (!playerData) {
       return res.status(404).json({ error: 'Jogador não encontrado' });
     }
@@ -73,17 +73,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await newRequestRef.set({
       requestId: newRequestRef.id,
+      status: 'pending',
       teamId,
       type: 'join_request',
-      status: 'pending',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    /// passo a role, a url do player e o id do request para a notificação
     const additionalInfos = [role, playerUrl, newRequestRef.id];
     await sendNotification({
       type: 'join_request',
-      message: `${playerNick} pediu para entrar no seu time`,
+      message: `${playerNick} pediu para entrar no seu time.`,
       senderId: playerId,
       receiverId: ownerId,
       teamId: teamId,
