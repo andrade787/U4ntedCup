@@ -70,20 +70,22 @@ const TimePage = ({ user, team, ValueUrl }: TeamProps) => {
     <section className="">
       <div className="relative bg-gradient-to-br from-Roxo/70 via-transparent">
         <div className="container px-3 pt-36">
-          <div className="flex justify-between items-center bg-gradient-to-l from-zinc-900 backdrop-blur-xl rounded-xl">
-            <Image className="rounded-l-xl" src={team.logo} width={200} height={200} alt={team.name} />
-            <div className="flex items-center flex-col justify-center">
-              <h1 className="font-semibold text-3xl mb-1">{team.name}</h1>
-              <div className="flex gap-2">
-                <p className="flex items-center gap-2"><Users size={16} />{playerCount} Players</p>
-                <p className="flex gap-2">| <ValorantIcon /></p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-3 mr-3">
+          <div className="flex max-md:flex-col max-md:flex-wrap justify-between items-center bg-gradient-to-l from-zinc-900 backdrop-blur-xl rounded-xl">
+            <div className="flex items-center w-full">
+              <Image className="rounded-l-xl max-md:w-full max-md:h-44 object-cover max-md:mb-3" src={team.logo} width={200} height={200} alt={team.name} />
+              <div className="flex items-center flex-col justify-center w-full">
+                <h1 className="font-semibold text-3xl mb-1">{team.name}</h1>
+                <div className="flex gap-2">
+                  <p className="flex items-center gap-2"><Users size={16} />{playerCount} Players</p>
+                  <p className="flex gap-2">| <ValorantIcon /></p>
+                </div>
+              </div></div>
+
+            <div className="flex items-center md:flex-col gap-3 max-md:w-full min-w-40 r-3">
 
               {user && user.uid == team.owner && <EditarTime />}
 
-              <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-2 flex-1 max-md:mb-5">
                 <div className="flex items-center justify-center gap-1 p-1 bg-zinc-800 rounded-xl">
                   {team.privacy === 'private' ? <LockKeyhole size={18} /> : <UnlockKeyhole size={18} />}
                   <h3>Time {team.privacy === 'private' ? 'Privado' : 'Público'}</h3>
@@ -99,10 +101,10 @@ const TimePage = ({ user, team, ValueUrl }: TeamProps) => {
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-t pt-16 pb-32 from-zinc-950 from-55%">
+        <div className="bg-gradient-to-t max-md:pt-8 pt-16 pb-32 from-zinc-950 from-55%">
           <div className="container px-3">
             <div className='w-full'>
-              <div className='flex border border-zinc-400/20 bg-zinc-950/30 rounded-xl'>
+              <div className='flex flex-wrap border border-zinc-400/20 bg-zinc-950/30 rounded-xl'>
                 <TabNavigation activeTab={activeTab} handleTabChange={handleTabChange} />
               </div>
             </div>

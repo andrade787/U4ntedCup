@@ -9,7 +9,8 @@ export default function PartidasDoTime() {
       </div>
 
       <div className="flex flex-col space-y-6">
-        <CardPartidastime />
+        <p>O player não jogou nenhuma partida no campeonato ainda.</p>
+        {/*         <CardPartidastime /> */}
       </div>
     </div >
   );

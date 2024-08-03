@@ -4,7 +4,7 @@ import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
-import { Frown } from "lucide-react"; // Importando o ícone Frown
+import { Frown } from "lucide-react";
 
 type Player = {
   nickname: string;
@@ -81,7 +81,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-wrap w-full gap-7">
+      <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-7">
         {loading ? (
           <>
             {[...Array(3)].map((_, index) => (
@@ -103,7 +103,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
               displayedPlayers.map((player, index) => {
                 const backgroundUrl = player.capaUrl ? player.capaUrl : '/assets/images/uanted_thumb.png';
                 return (
-                  <div key={index} className="flex flex-col bg-zinc-900 flex-1 min-w-96 rounded-xl animate-in fade-in-30">
+                  <div key={index} className="flex flex-col bg-zinc-900 rounded-xl animate-in fade-in-30">
                     <div className="flex flex-col items-center justify-center p-4 relative">
                       <div className="w-full h-full rounded-xl opacity-40 bg-no-repeat bg-cover bg-center absolute" style={{ backgroundImage: `url('${backgroundUrl}')` }}></div>
                       <div className="w-full h-full rounded-xl from-20% bg-gradient-to-t from-zinc-900 absolute"></div>
@@ -137,6 +137,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
         )}
       </div>
       <div className="flex justify-center mt-8">
+
         <Button variant='outline' onClick={handleLoadMore} disabled={loading || (page * playersPerPage >= filteredPlayers.length)}>
           {loading ? 'Buscando Jogadores..' : 'Ver Mais'}
         </Button>

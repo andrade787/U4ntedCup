@@ -12,8 +12,10 @@ const Campeonatos: React.FC = () => {
           <h2 className='text-2xl font-semibold'>Campeonatos</h2>
           <p className='text-sm text-zinc-300'>Estatísticas detalhadas de todos os campeonatos disputados pelo jogador</p>
         </div>
+        <p>O player não jogou nenhum campeonato até o momento.</p>
 
-        <Link href="#" className='flex-1 flex bg-zinc-900/50 rounded-xl border transition-colors animate-in zoom-in-90 hover:bg-zinc-900 relative'>
+
+        {/*   <Link href="#" className='flex-1 flex bg-zinc-900/50 rounded-xl border transition-colors animate-in zoom-in-90 hover:bg-zinc-900 relative'>
           <div className='w-full absolute -z-10 inset-0 opacity-20 bg-loser-gradient rounded-xl'></div>
 
           <Image
@@ -66,7 +68,7 @@ const Campeonatos: React.FC = () => {
               </div>
             </div>
           </div>
-        </Link>
+        </Link> */}
       </div>
     </>
   );

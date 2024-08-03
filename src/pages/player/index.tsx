@@ -14,12 +14,16 @@ interface AnotherPageProps {
 const AnotherPage = ({ user }: AnotherPageProps) => {
   const { setUser } = useUser();
   const [search, setSearch] = useState<string>("");
-
   useEffect(() => {
     if (user) {
       setUser(user);
     }
   }, [user, setUser]);
+
+
+
+
+
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -27,7 +31,7 @@ const AnotherPage = ({ user }: AnotherPageProps) => {
 
   return (
     <section className='flex pt-32 bg-gradient-to-br from-blue-100 via-transparent dark:from-Roxo/70 dark:via-transparent'>
-      <div className="container px-4">
+      <div className="container px-3">
 
 
         <div className="flex items-center relative rounded-xl mb-10 min-h-52 -z-10 w-full bg-cover bg-top bg-[url('/assets/images/PlayerBG.webp')]">
@@ -40,7 +44,7 @@ const AnotherPage = ({ user }: AnotherPageProps) => {
 
         <div className="bg-gradient-to-r from-Roxo/10 to-zinc-900 backdrop-blur-xl w-full p-2 px-4 rounded-xl mb-7 flex justify-between items-center">
           <div>
-            <h3><span className="font-semibold">10</span> Players Encontrados</h3>
+            <h3><span className="font-semibold"></span> Players Encontrados</h3>
           </div>
           <div className="p-4">
             <div className="relative">

@@ -69,7 +69,7 @@ export default function Header() {
     <header className={`z-40 w-full text-white fixed top-0 transition-all duration-300 ${isScrolled ? 'bg-zinc-800/60 backdrop-blur' : ''}`}>
       <div className="container py-2 px-3 flex justify-between items-center">
         <Link href="/" className="text-2xl font-semibold">
-          <Image alt="Logo" width={400} height={400} className=" max-w-44" src="/assets/logo.webp" />
+          <Image alt="Logo" width={176} height={176} className="max-w-36" src="/assets/logo.webp" />
         </Link>
 
         <div className="hidden md:flex space-x-2">
@@ -121,10 +121,10 @@ export default function Header() {
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/login">
-                <Button className="flex items-center gap-2" variant='roxo'><LogIn size={18} /> Entrar</Button>
+                <Button className="flex items-center gap-2" variant='roxo'>Entrar</Button>
               </Link> ou
               <Link href="/cadastro">
-                <Button className="flex items-center gap-2" variant='default'><PlusCircle size={18} />Cadastrar</Button>
+                <Button className="flex items-center gap-2" variant='default'>Cadastrar</Button>
               </Link>
             </div>
           )}

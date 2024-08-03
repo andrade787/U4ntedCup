@@ -103,7 +103,12 @@ const Partidas: React.FC = () => {
 
   return (
     <div className='flex flex-col'>
-      <div className='flex w-full p-4 bg-zinc-900/50 rounded-xl border transition-colors hover:bg-zinc-900 mb-5'>
+      <div className='flex-1 bg-zinc-900/50 rounded-xl border p-2 transition-colors animate-in zoom-in-90 mb-5'>
+        <h2 className='text-2xl font-semibold'>Partidas</h2>
+        <p className='text-sm text-zinc-300'>Partidas detalhadas de todos os campeonatos disputados pelo jogador</p>
+      </div>
+      <p>O player não jogou nenhuma partida no campeonato até o momento.</p>
+      {/*   <div className='flex w-full p-4 bg-zinc-900/50 rounded-xl border transition-colors hover:bg-zinc-900 mb-5'>
         <div className='w-full flex flex-col'>
           <div className='w-full flex gap-6 mb-2'>
             <div className='flex flex-col animate-in zoom-in-50'>
@@ -144,9 +149,9 @@ const Partidas: React.FC = () => {
             <h3 className='text-WinColor text-sm font-semibold'>75%</h3>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className='rounded-xl border bg-zinc-900/50'>
+      {/*   <div className='rounded-xl border bg-zinc-900/50'>
         {data.map((item, index) => {
           const classes = getClassNames(item.status, item.mvp);
 
@@ -179,7 +184,7 @@ const Partidas: React.FC = () => {
             </a>
           );
         })}
-      </div>
+      </div> */}
     </div>
   );
 };

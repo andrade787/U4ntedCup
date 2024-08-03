@@ -29,7 +29,7 @@ export default function Times({ user }: TimesProps) {
   const { setUser } = useUser();
   const [teams, setTeams] = useState<Team[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -40,7 +40,6 @@ export default function Times({ user }: TimesProps) {
   }, [user, setUser]);
 
   const fetchTeams = useCallback(async () => {
-    setLoading(true);
     try {
       const response = await fetch('/api/teams/get-teams', {
         method: 'POST',
@@ -64,7 +63,7 @@ export default function Times({ user }: TimesProps) {
 
   const handleSearch = debounce((term: string) => {
     setSearchTerm(term);
-    setPage(1); // Reset to first page on new search
+    setPage(1);
   }, 300);
 
   const filteredTeams = useMemo(() => {
@@ -95,16 +94,24 @@ export default function Times({ user }: TimesProps) {
         <section>
           <div className="bg-gradient-to-r from-Roxo/10 to-zinc-900 backdrop-blur-xl w-full p-2 px-4 rounded-xl mb-7 flex justify-between items-center">
             <div>
-              <h3><span className="font-semibold">{filteredTeams.length}</span> Times Encontrados</h3>
+              {loading ? (<><div className="flex gap-1"> <Skeleton className="w-2 h-4 bg-zinc-700" /><Skeleton className="w-36 h-4 bg-zinc-700" /></div></>)
+                : (
+                  <h3 className="animate-in zoom-in"><span className="font-semibold">{filteredTeams.length}</span> Times Encontrados</h3>
+                )}
             </div>
             <div className="p-4">
               <div className="relative">
-                <SearchIcon className="absolute left-2 top-2.5 h-4 w-4" />
-                <Input
-                  className="flex h-9 w-full pl-8 bg-zinc-900"
-                  placeholder="Pesquisar por time"
-                  onChange={(e) => handleSearch(e.target.value)}
-                />
+                {loading ? (<><Skeleton className="absolute left-2 top-2.5 h-4 w-4 bg-zinc-600" /><Skeleton className="flex h-9 w-56 pl-8 bg-zinc-800" /></>)
+                  : (
+                    <>
+                      <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 animate-in zoom-in" />
+                      <Input
+                        className="flex h-9 w-full pl-8 bg-zinc-900 animate-in zoom-in-50"
+                        placeholder="Pesquisar por time"
+                        onChange={(e) => handleSearch(e.target.value)}
+                      />
+                    </>
+                  )}
               </div>
             </div>
           </div>
@@ -122,7 +129,7 @@ export default function Times({ user }: TimesProps) {
               ))
             ) : paginatedTeams.length > 0 ? (
               paginatedTeams.map((team) => (
-                <Link key={team.url} href={'/times/' + team.url} className="flex flex-1 min-w-96 relative group bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-xl animate-in zoom-in group">
+                <Link key={team.url} href={'/times/' + team.url} className="flex flex-1 md:min-w-96 relative group bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-xl animate-in zoom-in group">
                   <Image className="rounded-l-xl group-hover:-translate-x-2 transition-all bg-zinc-800" alt={team.name} width={100} height={100} src={team.logo} />
                   <div className="flex justify-between items-center w-full p-3 gap-1">
                     <h3 className="font-semibold text-xl group-hover:-translate-x-2 transition-all">{team.name}</h3>

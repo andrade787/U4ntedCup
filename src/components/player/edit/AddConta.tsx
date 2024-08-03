@@ -190,10 +190,10 @@ export function AddConta({ gameAccounts }: AddContaProps) {
                           <SelectValue placeholder="Sua Função" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="duelista">Duelista</SelectItem>
-                          <SelectItem value="suporte">Suporte</SelectItem>
-                          <SelectItem value="iniciador">Iniciador</SelectItem>
-                          <SelectItem value="controlador">Controlador</SelectItem>
+                          <SelectItem value="Duelista">Duelista</SelectItem>
+                          <SelectItem value="Sentinela">Sentinela</SelectItem>
+                          <SelectItem value="Iniciador">Iniciador</SelectItem>
+                          <SelectItem value="Controlador">Controlador</SelectItem>
                         </SelectContent>
                       </Select>
                     )}

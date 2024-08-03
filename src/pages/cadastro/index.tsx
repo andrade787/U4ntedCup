@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import Link from "next/link";
 import Image from 'next/image';
 import FormCadastro from "@/components/cadastro/formCadastro";
+import SEO from '@/components/SEO';
 
 interface User {
     url?: string;
@@ -26,46 +27,57 @@ export default function Cadastro({ user }: Props) {
     }, [user, router]);
 
     return (
-        <div className="relative pt-14 bg-gradient-to-bl from-blue-100 via-transparent dark:from-Roxo dark:via-transparent">
-            <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
-                <div className="grid items-center md:grid-cols-2 gap-8 lg:gap-12">
-                    <div className="mt-4 md:mb-12 max-w-2xl">
-                        <div className='flex justify-center'>
-                            <Image
-                                className='mb-5'
-                                src="/assets/logo.webp"
-                                width={500}
-                                height={500}
-                                priority
-                                alt="U4nted Cup"
-                                style={{ width: 'auto', height: 'auto' }}
-                            />
+        <>
+            <SEO
+                title="U4nted Cup"
+                description="Participe dos melhores campeonatos de CS2 e Valorant na U4nted Cup. Jogue, compita e ganhe prêmios incríveis!"
+                keywords="campeonatos, CS2, Valorant, eSports, U4nted Cup, torneios de jogos"
+                author="U4nted Cup"
+                url="https://www.u4ntedcup.com.br"
+                image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.png"
+                twitterHandle="u4ntedcup"
+            />
+            <div className="relative pt-14 bg-gradient-to-bl from-blue-100 via-transparent dark:from-Roxo dark:via-transparent">
+                <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+                    <div className="grid items-center md:grid-cols-2 gap-8 lg:gap-12">
+                        <div className="mt-4 md:mb-12 max-w-2xl">
+                            <div className='flex justify-center'>
+                                <Image
+                                    className='mb-5'
+                                    src="/assets/logo.webp"
+                                    width={500}
+                                    height={500}
+                                    priority
+                                    alt="U4nted Cup"
+                                    style={{ width: 'auto', height: 'auto' }}
+                                />
+                            </div>
+                            <h1 className="mb-4 font-semibold text-center text-gray-800 text-4xl lg:text-5xl dark:text-neutral-200">
+                                Elevando a Experiência do E-Sports Amador ao Profissional.
+                            </h1>
+                            <p className="text-gray-600 text-center dark:text-neutral-400">
+                                Junte-se a nós agora mesmo e mergulhe em uma experiência verdadeiramente imersiva de um jogador de esportes profissional!
+                            </p>
                         </div>
-                        <h1 className="mb-4 font-semibold text-center text-gray-800 text-4xl lg:text-5xl dark:text-neutral-200">
-                            Elevando a Experiência do E-Sports Amador ao Profissional.
-                        </h1>
-                        <p className="text-gray-600 text-center dark:text-neutral-400">
-                            Junte-se a nós agora mesmo e mergulhe em uma experiência verdadeiramente imersiva de um jogador de esportes profissional!
-                        </p>
-                    </div>
 
-                    <div className="flex justify-end">
-                        <Card className="max-w-lg">
-                            <CardHeader>
-                                <CardTitle className="text-center">Formulário de Inscrição</CardTitle>
-                                <CardDescription className="text-center">Já possui uma conta?
-                                    <Link href="/login"> <span className="text-Roxo hover:text-white">Fazer Login</span></Link>
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className='bg-zinc-900'>
-                                <hr className="mb-5"></hr>
-                                <FormCadastro />
-                            </CardContent>
-                        </Card>
+                        <div className="flex justify-end">
+                            <Card className="max-w-lg">
+                                <CardHeader>
+                                    <CardTitle className="text-center">Formulário de Inscrição</CardTitle>
+                                    <CardDescription className="text-center">Já possui uma conta?
+                                        <Link href="/login"> <span className="text-Roxo hover:text-white">Fazer Login</span></Link>
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className='bg-zinc-900'>
+                                    <hr className="mb-5"></hr>
+                                    <FormCadastro />
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

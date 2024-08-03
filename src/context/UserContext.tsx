@@ -28,7 +28,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         .filter((notification) => !notification.isRead);
 
       setNotifications(newNotifications);
-      console.log(notifications)
+      console.log(newNotifications);
     } else {
       setNotifications([]);
     }
@@ -42,7 +42,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       return () => {
         if (notificationRef.current) {
           off(notificationRef.current, 'value', handleValueChange);
-
         }
       };
     }
@@ -53,8 +52,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -72,7 +71,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error during logout:", error);
     }
   };
-
 
   return (
     <UserContext.Provider value={{ user, notifications, setUser, logout }}>

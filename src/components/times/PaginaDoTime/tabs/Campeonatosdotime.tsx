@@ -8,7 +8,8 @@ export default function CampeonatosDoTime() {
           <h2 className='text-2xl font-semibold'>Campeonatos</h2>
           <p className='text-sm text-zinc-300'>Todos os campeonatos que o time participou</p>
         </div>
-        <CampeonatosTimes />
+        <p>O Player não jogou nenhum campeonato na U4nted Cup ainda.</p>
+        {/*  <CampeonatosTimes /> */}
       </div>
     </div>
   );

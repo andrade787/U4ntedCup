@@ -8,6 +8,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const is404 = Component.name === "NotFound";
 
   return (
+
     <UserProvider>
       <main>
         <Toaster />

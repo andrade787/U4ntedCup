@@ -39,7 +39,7 @@ const CardPlayers: React.FC<CardPlayersProps> = ({ player, user, team, isOwner }
         <div className="flex items-center gap-4">
           <Link target="_blank" href={`/player/${player.url}`}>
             <Avatar className="rounded-l-xl hover:opacity-80 transition-all">
-              <AvatarImage className='rounded-l-xl w-25 h-25' src={player.photoURL || ''} />
+              <AvatarImage className='rounded-l-xl w-25 h-25 object-cover' src={player.photoURL || ''} />
               <AvatarFallback className='flex items-center bg-zinc-800 rounded-l-xl justify-center font-semibold w-25 h-25'>
                 {Initial}
               </AvatarFallback>

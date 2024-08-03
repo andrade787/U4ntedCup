@@ -16,6 +16,7 @@ import { PlayerProps } from '@/lib/types';
 import { PlayerProvider, usePlayer } from '@/context/PlayerContext';
 import { useUser } from "@/context/UserContext";
 import { User } from "@/lib/types";
+import SEO from '@/components/SEO';
 
 
 interface Props {
@@ -40,93 +41,106 @@ const PlayerPageContent = ({ user }: Props) => {
   }
 
   return (
-    <div className='bg-gradient-to-br from-Roxo/70 via-transparent pb-20'>
-      <section className='flex pt-32'>
-        <div className='container px-4'>
-          <div className="relative rounded-xl w-full pt-10 pb-10">
-            <div
-              className={`relative flex justify-between rounded-xl p-5 pt-10 pb-10 w-full ${playerData.capaUrl ? '' : 'from-Roxo/80 bg-gradient-to-r'}`}
-              style={{
-                backgroundImage: playerData.capaUrl ? `url('${playerData.capaUrl}')` : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
-              {playerData.capaUrl &&
-                <div className="absolute z-10 inset-0 from-zinc-900 bg-gradient-to-r rounded-lg"></div>
-              }
-              <div className='flex items-center gap-5 w-full z-20'>
-                <Avatar className='w-48 h-48 '>
-                  <AvatarImage className='w-full object-cover' src={playerData.photoURL} />
-                  <AvatarFallback className='bg-zinc-900/70 text-6xl font-semibold'>{initialName}</AvatarFallback>
-                </Avatar>
-                <div className='flex justify-between items-center w-full'>
-                  <div>
-                    <h3 className='text-2xl font-semibold'>{playerData.nickname}</h3>
-                    <h4 className='text-xl font-normal text-white/80'>{playerData.name}</h4>
-                    <div className='flex'>
-                      {playerData.valorant && <ValorantIcon size={30} color='text-white' />}
-                      {playerData.cs2 && <Cs2Icon size={30} color='text-white' />}
+    <>
+      <SEO
+        title="U4nted Cup"
+        description="Participe dos melhores campeonatos de CS2 e Valorant na U4nted Cup. Jogue, compita e ganhe prêmios incríveis!"
+        keywords="campeonatos, CS2, Valorant, eSports, U4nted Cup, torneios de jogos"
+        author="U4nted Cup"
+        url="https://www.u4ntedcup.com.br"
+        image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.png"
+        twitterHandle="u4ntedcup"
+      />
+      <div className='bg-gradient-to-br from-Roxo/70 via-transparent pb-20'>
+        <section className='flex max-md:pt-20 pt-32'>
+          <div className='container px-3'>
+            <div className="relative rounded-xl w-full pt-10 max-md:pb-0 pb-10">
+              <div
+                className={`relative flex justify-between rounded-xl p-5 pt-10 pb-10 w-full ${playerData.capaUrl ? '' : 'from-Roxo/80 bg-gradient-to-r'}`}
+                style={{
+                  backgroundImage: playerData.capaUrl ? `url('${playerData.capaUrl}')` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                {playerData.capaUrl &&
+                  <div className="absolute z-10 inset-0 from-zinc-900 bg-gradient-to-r rounded-lg"></div>
+                }
+                <div className='flex max-md:flex-col items-center gap-5 w-full z-20'>
+                  <Avatar className='w-48 h-48 '>
+                    <AvatarImage className='w-full object-cover' src={playerData.photoURL} />
+                    <AvatarFallback className='bg-zinc-900/70 text-6xl font-semibold'>{initialName}</AvatarFallback>
+                  </Avatar>
+                  <div className='flex max-md:justify-center justify-between items-center w-full'>
+                    <div>
+                      <h3 className='text-2xl font-semibold'>{playerData.nickname}</h3>
+                      <h4 className='text-xl font-normal text-white/80'>{playerData.name}</h4>
+                      <div className='flex'>
+                        {playerData.valorant && <ValorantIcon size={30} color='text-white' />}
+                        {playerData.cs2 && <Cs2Icon size={30} color='text-white' />}
+                      </div>
                     </div>
-                  </div>
-                  <div className='flex flex-col gap-3'>
-                    {isOwner &&
-                      <>
-                        <EditPlayer />
+                    <div className='flex flex-col gap-3'>
+                      {isOwner &&
+                        <>
+                          <EditPlayer />
 
-                        <EditCapa capaUrl={playerData.capaUrl} />
-                      </>
-                    }
+                          <EditCapa capaUrl={playerData.capaUrl} />
+                        </>
+                      }
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      <section>
-        <div className='container px-3 mt-10 flex gap-5'>
-          <div className='flex flex-col w-1/5'>
-            <div className='border bg-zinc-950/30 rounded-xl'>
-              <Button
-                variant={activeTab === 'informacoes' ? 'roxo' : 'ghost'}
-                className={`w-full hover:bg-zinc-900/60 text-base ${activeTab === 'informacoes' ? 'hover:bg-Roxo rounded-b-none' : ''}`}
-                onClick={() => handleTabClick('informacoes')}
-              >
-                <UserIcon size={20} className='mr-2' />Informações
-              </Button>
-              <Button
-                variant={activeTab === 'partidas' ? 'roxo' : 'ghost'}
-                className={`w-full hover:bg-zinc-900/60 text-base ${activeTab === 'partidas' ? 'hover:bg-Roxo' : ''}`}
-                onClick={() => handleTabClick('partidas')}
-              >
-                <ListCollapse size={20} className='mr-2' /> Partidas
-              </Button>
-              <Button
-                variant={activeTab === 'campeonatos' ? 'roxo' : 'ghost'}
-                className={`w-full hover:bg-zinc-900/60 text-base ${activeTab === 'campeonatos' ? 'hover:bg-Roxo' : ''}`}
-                onClick={() => handleTabClick('campeonatos')}
-              >
-                <Trophy size={20} className='mr-2' /> Campeonatos
-              </Button>
+        </section>
+        <section>
+          <div className='container px-3 mt-10 flex gap-5'>
+            <div className='w-full flex max-md:flex-wrap max-md:flex-col gap-5'>
+              <div className='flex flex-col md:w-1/5'>
+                <div className='border bg-zinc-950/30 rounded-xl'>
+                  <Button
+                    variant={activeTab === 'informacoes' ? 'roxo' : 'ghost'}
+                    className={`w-full hover:bg-zinc-900/60 text-base ${activeTab === 'informacoes' ? 'hover:bg-Roxo rounded-b-none' : ''}`}
+                    onClick={() => handleTabClick('informacoes')}
+                  >
+                    <UserIcon size={20} className='mr-2' />Informações
+                  </Button>
+                  <Button
+                    variant={activeTab === 'partidas' ? 'roxo' : 'ghost'}
+                    className={`w-full hover:bg-zinc-900/60 text-base ${activeTab === 'partidas' ? 'hover:bg-Roxo' : ''}`}
+                    onClick={() => handleTabClick('partidas')}
+                  >
+                    <ListCollapse size={20} className='mr-2' /> Partidas
+                  </Button>
+                  <Button
+                    variant={activeTab === 'campeonatos' ? 'roxo' : 'ghost'}
+                    className={`w-full hover:bg-zinc-900/60 text-base ${activeTab === 'campeonatos' ? 'hover:bg-Roxo' : ''}`}
+                    onClick={() => handleTabClick('campeonatos')}
+                  >
+                    <Trophy size={20} className='mr-2' /> Campeonatos
+                  </Button>
+                </div>
+              </div>
+              <div className='flex flex-1 flex-col'>
+                <div ref={tabRef}>
+                  {activeTab === 'informacoes' && (
+                    <Informacoes user={user} />
+                  )}
+                  {activeTab === 'partidas' && (
+                    <Partidas />
+                  )}
+                  {activeTab === 'campeonatos' && (
+                    <Campeonatos />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-          <div className='flex flex-1 flex-col'>
-            <div ref={tabRef}>
-              {activeTab === 'informacoes' && (
-                <Informacoes user={user} />
-              )}
-              {activeTab === 'partidas' && (
-                <Partidas />
-              )}
-              {activeTab === 'campeonatos' && (
-                <Campeonatos />
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 };
 

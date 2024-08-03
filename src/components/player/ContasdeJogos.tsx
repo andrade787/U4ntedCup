@@ -19,7 +19,7 @@ const ContasDeJogos = () => {
         <div className='flex justify-between bg-zinc-900/50 items-center border rounded-xl mt-2 hover:bg-zinc-900 transition-colors animate-in slide-in-from-top-5'>
           <div className='flex items-center gap-4'>
             <Image
-              className="rounded-l-xl w-40 h-40 object-cover object-top animate-in fade-in"
+              className="rounded-l-xl w-40 h-40 max-md:h-56 object-cover object-top animate-in fade-in"
               src={valorantAccount.card || ''}
               alt="Player Card"
               width={160}

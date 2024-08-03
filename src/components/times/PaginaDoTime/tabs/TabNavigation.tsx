@@ -17,7 +17,7 @@ const TabNavigation: React.FC<TabProps> = ({ activeTab, handleTabChange }) => {
   ];
 
   return (
-    <div className="flex w-full">
+    <div className="flex flex-wrap w-full">
       {tabs.map((tab, index) => (
         <div
           key={tab.id}

@@ -105,3 +105,15 @@ export interface TeamProps {
   team: TeamInfos;
   team_players: TeamPlayers[];
 }
+
+
+
+export interface Tournament {
+  id: string;
+  name: string;
+  game: string;
+  startDate: number;
+  endDate: number;
+  status: string;
+  createdAt: number;
+}
