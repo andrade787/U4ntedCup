@@ -1,9 +1,9 @@
 import { GetServerSideProps } from "next";
 import { withUser } from "@/lib/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
-import { User } from "@/lib/types";
-import { BadgeDollarSign, Calendar, Dot, Goal, Star, Twitch } from "lucide-react";
+import { Tournament, User } from "@/lib/types";
+import { BadgeDollarSign, Calendar, Dot, Goal, Star, Twitch, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ValorantIcon } from "@/components/icons/ValorantIcon";
 import { DiscordIcon } from "@/components/icons/DiscordIcon";
@@ -13,6 +13,8 @@ import { motion } from "framer-motion"
 import { CampeonatosBackground, textVariants } from "@/lib/framer/homepage";
 import { Cs2Icon } from "@/components/icons";
 import SEO from "@/components/SEO";
+import TournamentCard from "@/components/campeonatos/cards/TournamentCard";
+import { LoadingCardTournament } from "@/components/campeonatos/Loading";
 
 
 interface HomePageProps {
@@ -20,9 +22,12 @@ interface HomePageProps {
 }
 
 const HomePage = ({ user }: HomePageProps) => {
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const { setUser } = useUser();
   const numberOfLines = 16;
   const spacing = 6;
-  const { setUser } = useUser();
 
   useEffect(() => {
     if (user) {
@@ -30,6 +35,32 @@ const HomePage = ({ user }: HomePageProps) => {
     }
   }, [user, setUser]);
 
+  useEffect(() => {
+    const fetchTournaments = async () => {
+      try {
+        const response = await fetch('/api/tournaments');
+        if (!response.ok) {
+          throw new Error('Ocorreu um erro ao buscar os campeonatos. Por favor, tente novamente mais tarde!');
+        }
+        const data: any[] = await response.json();
+
+        // Convertendo as datas para strings formatadas
+        const formattedData: Tournament[] = data.map((tournament) => ({
+          ...tournament,
+          startDate: new Date(tournament.startDate._seconds * 1000).toLocaleDateString('pt-BR'),
+          endDate: new Date(tournament.endDate._seconds * 1000).toLocaleDateString('pt-BR'),
+        }));
+
+        setTournaments(formattedData);
+      } catch (err) {
+        setError('Ocorreu um erro ao buscar os campeonatos. Por favor, tente novamente mais tarde!');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTournaments();
+  }, []);
 
   return (
     <>
@@ -39,7 +70,7 @@ const HomePage = ({ user }: HomePageProps) => {
         keywords="campeonatos, CS2, Valorant, eSports, U4nted Cup, torneios de jogos"
         author="U4nted Cup"
         url="https://www.u4ntedcup.com.br"
-        image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.png"
+        image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.webp"
         twitterHandle="u4ntedcup"
       />
       <section className="bg-RoxoEscuro pb-32 relative z-10 pt-28 w-full">
@@ -68,13 +99,7 @@ const HomePage = ({ user }: HomePageProps) => {
 
             </div>
 
-            <Image
-              className='md:hidden object-cover absolute top-0 left-0 bottom-0 right-0 transform -z-10 w-[100%]'
-              src='/assets/images/bg-1.webp'
-              alt='imagem'
-              width={517}
-              height={962}
-            />
+
 
 
             <div className="absolute top-0 left-1/2 bottom-0 transform -translate-x-1/2 -z-10 ">
@@ -110,13 +135,13 @@ const HomePage = ({ user }: HomePageProps) => {
                   <a href="#" className="flex items-center hover:bg-zinc-800 w-full rounded-xl p-2 transition-colors cursor-pointer">
                     <Image
                       className='rounded-xl w-12 h-12 object-cover mr-2'
-                      src='/assets/images/loudxique.webp'
+                      src='/assets/images/TheKnights.webp'
                       alt='imagem'
                       width={960}
                       height={960}
                     />
                     <div className="flex flex-col flex-grow">
-                      <h2 className="text-lg font-semibold text-white">Loud Xique Xique BA</h2>
+                      <h2 className="text-lg font-semibold text-white">TheKnights</h2>
                       <p className="flex items-center text-gray-400 text-sm">1ª Edição | <ValorantIcon size={20} /> Valorant</p>
                     </div>
                     <div className="text-right ml-2">
@@ -130,7 +155,7 @@ const HomePage = ({ user }: HomePageProps) => {
 
           </div>
 
-          <div className="absolute inset-0 -z-30">
+          <div className="max-md:hidden absolute inset-0 -z-30">
             <div className="absolute inset-0 grid grid-cols-16 gap-x-1">
               {[...Array(numberOfLines)].map((_, index) => (
                 <div
@@ -176,45 +201,30 @@ const HomePage = ({ user }: HomePageProps) => {
         <div className="container flex items-center border rounded-xl p-5">
           <div className="flex flex-col w-full">
 
-            <div className="flex justify-between">
-              <h1 className="font-bold text-4xl mb-2">CAMPEONATOS</h1>
-              {/* <Button variant='roxo'>Ver Todos</Button> */}
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="font-bold text-2xl md:text-4xl">CAMPEONATOS</h1>
+              <Link href='/campeonatos'><Button variant='roxo'>Ver Todos</Button></Link>
             </div>
 
-            <div className="flex flex-col rounded-xl md:w-1/4 border hover:bg-zinc-100/5 transition-all">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
 
-              <div className="relative flex flex-col rounded-xl">
 
-                <Image
-                  className='rounded-t-xl filter brightness-50'
-                  src='https://firebasestorage.googleapis.com/v0/b/uanted.appspot.com/o/Tournament%2F672b17199778379.665743d0d31f4.webp?alt=media&token=415a5ae1-cb87-45ad-87b6-52e800221f49'
-                  alt='imagem'
-                  width={384}
-                  height={230}
+              {loading && <LoadingCardTournament />}
+
+              {error && <p>{error}</p>}
+
+              {!loading && tournaments && tournaments.map((tournament) => (
+                <TournamentCard
+                  key={tournament.id}
+                  status={tournament.status}
+                  startDate={tournament.startDate}
+                  endDate={tournament.endDate}
+                  title={tournament.name}
+                  prize={`R$${tournament.prize} Em Prêmios`}
+                  imageUrl={tournament.imageCamp}
+                  tournamentLink={`/campeonatos/${tournament.campUrl}`}
                 />
-                <Link href="/campeonatos/ValorantEliteInvitational">
-                  <h1 className="absolute bottom-0 left-0 w-full text-xl font-semibold text-center flex justify-center items-center gap-2 bg-gradient-to-b pb-5 from-transparent to-background text-white hover:text-white/80 mt-2">
-                    <ValorantIcon size={25} color="text-white" /> Valorant Elite Invitational
-                  </h1>
-                </Link>
-              </div>
-
-              <div className="flex flex-col p-2 space-y-2 mt-2">
-                <div className="flex items-center flex-col">
-                  <p className="flex gap-2 items-center"><Star size={16} /> Fase de Grupos + Playoffs</p>
-                  <p className="flex gap-2 items-center"><Twitch size={16} /> Jogos transmitidos ao vivo</p>
-                  <p className="flex gap-2 items-center"><Star size={16} /> R$430 Em Prêmios</p>
-                </div>
-                <hr className="py-1" />
-                <div className="flex flex-col items-center">
-                  <div className="flex gap-2 items-center mb-2 bg-white text-black py-1 px-2 rounded-xl w-full justify-center"><Calendar size={17} />De 19/08 até 25/08
-                  </div>
-                  <Link className="w-full" href='/campeonatos/ValorantEliteInvitational'>
-                    <Button variant='roxo' className="w-full" >Participar / Informações</Button>
-                  </Link>
-                </div>
-              </div>
-
+              ))}
             </div>
 
 

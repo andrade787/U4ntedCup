@@ -34,7 +34,7 @@ export default function Cadastro({ user }: Props) {
                 keywords="campeonatos, CS2, Valorant, eSports, U4nted Cup, torneios de jogos"
                 author="U4nted Cup"
                 url="https://www.u4ntedcup.com.br"
-                image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.png"
+                image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.webp"
                 twitterHandle="u4ntedcup"
             />
             <div className="relative pt-14 bg-gradient-to-bl from-blue-100 via-transparent dark:from-Roxo dark:via-transparent">

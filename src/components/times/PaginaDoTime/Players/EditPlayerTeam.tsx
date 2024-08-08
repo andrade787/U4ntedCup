@@ -27,7 +27,7 @@ const playerSchema = z.object({
 
 export function EditPlayerTeam({ roles, nickname, team, playerId, isOwner }: EditPlayerTeamProps) {
   const { toast } = useToast();
-  const { team_players, setTeamPlayers } = useTeam();  // Get the team_players and setTeamPlayers from the context
+  const { setTeamPlayers } = useTeam();  // Get the players and setTeamPlayers from the context
 
   const initialRole = useMemo(() => {
     return roles.find(role => ["Controlador", "Duelista", "Iniciador", "Sentinela"].includes(role)) || undefined;
@@ -164,7 +164,7 @@ export function EditPlayerTeam({ roles, nickname, team, playerId, isOwner }: Edi
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
-        <Button className="flex items-center gap-1 mr-2" onClick={() => setIsSheetOpen(true)}><Edit size={18} /> Editar Player</Button>
+        <Button className="flex items-center gap-1 mr-2 max-sm:flex-1 " onClick={() => setIsSheetOpen(true)}><Edit size={18} /> Editar Player</Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>

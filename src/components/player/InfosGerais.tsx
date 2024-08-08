@@ -25,13 +25,13 @@ export default function InfosGerais() {
   const { user } = useUser();
   const { toast } = useToast();
   const [selectedPhoto, setSelectedPhoto] = useState<string | undefined>(playerData.photoURL);
-  const [newName, setNewName] = useState(playerData.name);
+  const [newName, setNewName] = useState(playerData.firstName);
   const [newNick, setNewNick] = useState(playerData.nickname);
   const [newEmail, setNewEmail] = useState(user?.email);
   const [newSubscription, setNewSubscription] = useState(playerData.assinaturaPlayer);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const initialName = playerData.name.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
+  const initialName = playerData.firstName.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
 
   const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -78,7 +78,6 @@ export default function InfosGerais() {
       assinaturaPlayer: newSubscription,
     };
 
-    console.log(updatedData)
 
     // Valida os dados usando o schema do Zod
     const result = formSchema.safeParse(updatedData);
@@ -134,7 +133,7 @@ export default function InfosGerais() {
       <div className="flex flex-col items-center justify-center w-full">
         <div className="flex items-center gap-5">
           <Avatar className="w-16 h-16">
-            <AvatarImage className="w-full object-cover" src={selectedPhoto || playerData.photoURL} />
+            <AvatarImage className="w-full rounded-full object-cover" src={selectedPhoto || playerData.photoURL} />
             <AvatarFallback>{initialName}</AvatarFallback>
           </Avatar>
           <Button variant='ghost' type="button" onClick={() => document.getElementById('photo-upload')?.click()}>Alterar Foto</Button>

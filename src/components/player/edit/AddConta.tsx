@@ -29,10 +29,8 @@ import { AlertCircle, Plus, RotateCcw, LoaderCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { usePlayer } from "@/context/PlayerContext";
 
-interface AddContaProps {
-  gameAccounts: { [key: string]: any } | null | undefined;
-}
 
 const schema = z.object({
   nickname: z.string().min(1, "Nickname é obrigatório"),
@@ -41,7 +39,8 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-export function AddConta({ gameAccounts }: AddContaProps) {
+export function AddConta() {
+  const { gameAccount } = usePlayer();
   const { toast } = useToast();
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -129,9 +128,9 @@ export function AddConta({ gameAccounts }: AddContaProps) {
                   <Cs2Icon color="text-white/20" size={60} />
                   <h4 className="text-white/20">Cs2</h4>
                 </div>
-                <div className={`flex flex-col items-center bg-zinc-900 ${gameAccounts?.Valorant ? 'cursor-not-allowed' : 'hover:bg-zinc-700 cursor-pointer'} transition-colors rounded-xl p-5`} onClick={() => !gameAccounts?.Valorant && handleGameSelection('valorant')}>
-                  <ValorantIcon color={`${gameAccounts?.Valorant ? 'text-white/20' : ''}`} size={60} />
-                  <h4 className={`${gameAccounts?.Valorant ? 'text-white/20' : ''}`}>Valorant</h4>
+                <div className={`flex flex-col items-center bg-zinc-900 ${gameAccount ? 'cursor-not-allowed' : 'hover:bg-zinc-700 cursor-pointer'} transition-colors rounded-xl p-5`} onClick={() => !gameAccount && handleGameSelection('valorant')}>
+                  <ValorantIcon color={`${gameAccount ? 'text-white/20' : ''}`} size={60} />
+                  <h4 className={`${gameAccount ? 'text-white/20' : ''}`}>Valorant</h4>
                 </div>
               </div>
             </div>

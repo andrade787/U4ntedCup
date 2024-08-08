@@ -70,7 +70,7 @@ export default function EditarTime() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 w-full" disabled={isSubmitting}>
+        <Button className="flex items-center gap-2 max-sm:max-w-40 w-full" disabled={isSubmitting}>
           <Settings2 size={18} /> Editar Time
         </Button>
       </DialogTrigger>

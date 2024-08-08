@@ -47,15 +47,13 @@ export default function ComentariosPerfil() {
 
   const fetchComments = useCallback(async () => {
     try {
-      const response = await axios.post<{ comments: Comment[] }>('/api/player/getComment', { playerId: playerData.id });
-      console.log('API response:', response.data);
+      const response = await axios.post<{ comments: Comment[] }>('/api/player/getComment', { playerId: playerData.uid });
       if (response.data.comments.length === 0) {
         setNoMoreComments(true);
       }
       setComments(response.data.comments.map(comment => ({ ...comment, url: comment.url || null })) || []);
       setCommentsLoaded(true);
     } catch (error) {
-      console.log('Fetch error:', error);
       toast({
         title: "Erro ao buscar comentários",
         description: "Não foi possível carregar os comentários. Tente novamente mais tarde.",
@@ -64,7 +62,7 @@ export default function ComentariosPerfil() {
     } finally {
       setIsLoading(false);
     }
-  }, [playerData.id, setComments, toast]);
+  }, [playerData.uid, setComments, toast]);
 
   const updatePaginatedComments = useCallback(() => {
     const startIndex = (currentPage - 1) * commentsPerPage;
@@ -92,7 +90,7 @@ export default function ComentariosPerfil() {
     if (!user?.uid) return;
 
     const validation = commentSchema.safeParse({
-      playerId: playerData.id,
+      playerId: playerData.uid,
       userId: user.uid,
       comment: comment.trim()
     });
@@ -110,7 +108,7 @@ export default function ComentariosPerfil() {
 
     try {
       const response = await axios.post('/api/player/addComment', {
-        playerId: playerData.id,
+        playerId: playerData.uid,
         userId: user.uid,
         comment: comment.trim()
       });
@@ -225,7 +223,7 @@ export default function ComentariosPerfil() {
                   <ComentarioPlayer text={com.Comment.trim()} />
                 </div>
               </div>
-            )) : <h3 className='text-zinc-200 flex items-center gap-2 justify-center'><Frown /> Nenhum comentário encontrado no perfil de<span className='font-semibold'>{user?.nickname}</span> até o momento..</h3>
+            )) : <h3 className='text-zinc-200 flex flex-wrap items-center gap-2 justify-center text-center'><Frown /> Nenhum comentário encontrado no perfil de {user?.nickname} até o momento..</h3>
           )}
         </div>
         <ComentariosPagination

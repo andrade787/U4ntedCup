@@ -23,7 +23,7 @@ export function EditContasdeJogos({ nick, tag, role }: EditContasdeJogosProps) {
   const handleDeleteClick = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/gameAccounts/v1/ManageAccounts', {
+      const response = await fetch('/api/game_accounts/v1/ManageAccounts', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export function EditContasdeJogos({ nick, tag, role }: EditContasdeJogosProps) {
   const handleSaveClick = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/gameAccounts/v1/ManageAccounts', {
+      const response = await fetch('/api/game_accounts/v1/ManageAccounts', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

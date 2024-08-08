@@ -30,7 +30,7 @@ export default function NotificationHeader({ user, notifications }: Notification
   const handleResponse = async (notificationId: string, requestId: string, status: 'accepted' | 'rejected') => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/player/${requestId}/accept-invite`, {
+      const response = await fetch(`/api/player/requests/${requestId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export default function NotificationHeader({ user, notifications }: Notification
                 <div key={index} className="flex hover:bg-zinc-800/50 border-b-2 transition-colors">
                   <div className="flex p-4 flex-col w-full">
                     <div className="flex items-center gap-2">
-                      <Image src="/assets/favicon.png" width={20} height={20} alt="icon" />
+                      <Image src="/favicon.webp" width={20} height={20} alt="icon" />
                       <p className="text-zinc-100">{notification.message} <span className="font-medium">Deseja aceitar?</span></p>
                     </div>
                     <p className="text-sm text-zinc-400 ml-7"> {formatDistanceToNow(convertTimestampToDate(notification.createdAt), { addSuffix: true, locale: ptBR })}</p>

@@ -17,6 +17,7 @@ import { PlayerProvider, usePlayer } from '@/context/PlayerContext';
 import { useUser } from "@/context/UserContext";
 import { User } from "@/lib/types";
 import SEO from '@/components/SEO';
+import PlayerNotFound from '@/components/player/PlayerNotFound';
 
 
 interface Props {
@@ -28,27 +29,26 @@ const PlayerPageContent = ({ user }: Props) => {
   const router = useRouter();
   const activeTab = router.query.tab as string || 'informacoes';
   const initialName = playerData?.nickname.match(/(\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
-  console.log(playerData)
   useEffect(() => {
     if (user) {
       setUser(user);
-      console.log(user)
     }
   }, [user, setUser]);
 
   if (!playerData) {
-    return <div>Player not found</div>;
+    return <PlayerNotFound />;
   }
+  console.log(playerData)
 
   return (
     <>
       <SEO
-        title="U4nted Cup"
-        description="Participe dos melhores campeonatos de CS2 e Valorant na U4nted Cup. Jogue, compita e ganhe prêmios incríveis!"
-        keywords="campeonatos, CS2, Valorant, eSports, U4nted Cup, torneios de jogos"
+        title={`${playerData.nickname} | U4nted Cup`}
+        description={`${playerData.nickname} está participando dos mais emocionantes campeonatos de CS2 e Valorant na U4nted Cup. Jogue, compita e conquiste prêmios incríveis!`}
+        keywords="campeonatos, CS2, Valorant, eSports, U4nted Cup, torneios de jogos, competição, prêmios"
         author="U4nted Cup"
-        url="https://www.u4ntedcup.com.br"
-        image="https://www.u4ntedcup.com.br/assets/images/uanted_thumb.png"
+        url={`https://www.u4ntedcup.com.br/player/${playerData.url}`}
+        image={`${playerData.photoURL || 'https://www.u4ntedcup.com.br/assets/images/uanted_thumb.webp'}`}
         twitterHandle="u4ntedcup"
       />
       <div className='bg-gradient-to-br from-Roxo/70 via-transparent pb-20'>
@@ -74,10 +74,10 @@ const PlayerPageContent = ({ user }: Props) => {
                   <div className='flex max-md:justify-center justify-between items-center w-full'>
                     <div>
                       <h3 className='text-2xl font-semibold'>{playerData.nickname}</h3>
-                      <h4 className='text-xl font-normal text-white/80'>{playerData.name}</h4>
+                      <h4 className='text-xl font-normal text-white/80'>{playerData.firstName}</h4>
                       <div className='flex'>
-                        {playerData.valorant && <ValorantIcon size={30} color='text-white' />}
-                        {playerData.cs2 && <Cs2Icon size={30} color='text-white' />}
+                        {/*      {playerData.valorant && <ValorantIcon size={30} color='text-white' />}
+                        {playerData.cs2 && <Cs2Icon size={30} color='text-white' />} */}
                       </div>
                     </div>
                     <div className='flex flex-col gap-3'>
@@ -156,67 +156,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const user = await withUser(context);
   const { url } = context.params as { url: string };
 
-  if (!url) {
-    return {
-      props: {
-        playerData: null,
-      },
-    };
-  }
+  let playerData = null;
 
   try {
-    const userDocRef = firestore.collection("players").where("url", "==", url).limit(1);
-    const userSnapshot = await userDocRef.get();
-    if (userSnapshot.empty) {
-      return {
-        props: {
-          playerData: null,
-        },
-      };
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/player/${url}?type=url`);
+    if (response.ok) {
+      playerData = await response.json();
     }
-
-    const userDoc = userSnapshot.docs[0];
-    const userData = userDoc.data();
-
-    const gameAccountsSnapshot = await firestore
-      .collection(`players/${userDoc.id}/game_account`)
-      .get();
-
-    const gameAccounts = gameAccountsSnapshot.empty
-      ? null
-      : gameAccountsSnapshot.docs.reduce((acc, doc) => {
-        const data = doc.data();
-        if (data.last_update) {
-          data.last_update = data.last_update.toDate().toISOString();
-        }
-        acc[doc.id] = data;
-        return acc;
-      }, {} as { [key: string]: any });
-
-
-    return {
-      props: {
-        user,
-        playerData: {
-          id: userDoc.id,
-          name: userData.firstName || "Indefinido",
-          photoURL: userData.photoURL || null,
-          nickname: userData.nickname || "Sem NickName",
-          url: userData.url || null,
-          capaUrl: userData.capaUrl || null,
-          assinaturaPlayer: userData.assinaturaPlayer || null,
-          gameAccounts,
-        },
-      },
-    };
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error(error);
+  }
+
+  if (!playerData) {
     return {
       props: {
         playerData: null,
+        user
       },
     };
   }
+
+  return {
+    props: {
+      playerData,
+      user
+    },
+  };
+
 };
 
 export default React.memo(PlayerPage);

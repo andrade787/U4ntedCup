@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { firestore, admin } from '@/firebase/firebaseAdmin';
 import { z } from 'zod';
 import { verifyAndRefreshToken } from '@/utils/verifytoken';
+import { deletePlayerFromTeam } from '@/controllers/teams/delete-playerTeam';
 
 const schema = z.object({
   playerId: z.string(),
@@ -56,36 +57,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } else if (req.method === 'DELETE') {
     const VerifyToken = await verifyAndRefreshToken(req as any, res as any);
-    const uid = VerifyToken?.uid;
+    const userId = VerifyToken?.uid;
 
-    if (!uid) {
+    if (!userId) {
       return res.status(401).json({ error: 'Não autorizado' });
     }
-
     try {
       const { playerId } = req.body;
-      const teamRef = firestore.collection('teams').doc(teamId as string);
-      const teamSnapshot = await teamRef.get();
-      const teamData = teamSnapshot.data();
 
-      if (!teamData) {
-        return res.status(401).json({ error: 'Não conseguimos localizar o time solicitado. Se você acredita que o time existe e o problema persiste, por favor, entre em contato conosco para obter assistência.' });
+      // Chama a função deletePlayerFromTeam
+      const result = await deletePlayerFromTeam({ teamId: teamId as string, playerId, userId });
+
+      if (result.error) {
+        return res.status(400).json({ error: result.error });
       }
 
-      if (teamData.owner == playerId) {
-        return res.status(400).json({ error: 'Você não pode deletar o dono do time.' });
-      }
-
-      if (teamData.owner != uid) {
-        return res.status(401).json({ error: 'Não autorizado' });
-      }
-
-      await teamRef.collection('players').doc(playerId).update({
-        status: "removed",
-        leaveDate: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      res.status(200).json({ message: 'Player Deletado Com Sucesso!' });
+      res.status(200).json({ message: result.message });
     } catch (error) {
       res.status(500).json({ message: 'Ocorreu um erro ao deletar o player. Tente novamente mais tarde', error: (error as Error).message });
     }

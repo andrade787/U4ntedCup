@@ -1,4 +1,3 @@
-// components/SearchPlayers.tsx
 import { Frown, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchInput from "@/components/ui/inputsearch";
@@ -19,19 +18,18 @@ interface Player {
 
 interface SearchPlayersProps {
   team: TeamInfos;
-  team_players: TeamPlayers[];
+  players: TeamPlayers[];
 }
 
 const ITEMS_PER_PAGE = 5;
 
-export default function SearchPlayers({ team, team_players }: SearchPlayersProps) {
+export default function SearchPlayers({ team, players }: SearchPlayersProps) {
   const [searchValue, setSearchValue] = useState('');
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [Players, setPlayers] = useState<Player[]>([]);
   const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  console.log(team_players);
   useEffect(() => {
     const fetchPlayers = async () => {
       setLoading(true);
@@ -42,7 +40,7 @@ export default function SearchPlayers({ team, team_players }: SearchPlayersProps
         },
         body: JSON.stringify({
           teamId: team.id,
-          teamPlayers: team_players
+          teamPlayers: players
         })
       });
       const data: Player[] = await response.json();
@@ -52,7 +50,7 @@ export default function SearchPlayers({ team, team_players }: SearchPlayersProps
     };
 
     fetchPlayers();
-  }, [team.id, team_players]);
+  }, [team.id, players]); // Remover Players da lista de dependências
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -62,7 +60,7 @@ export default function SearchPlayers({ team, team_players }: SearchPlayersProps
   };
 
   const filterPlayers = (searchTerm: string) => {
-    const filtered = players.filter(player =>
+    const filtered = Players.filter(player =>
       player.nickname.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredPlayers(filtered);

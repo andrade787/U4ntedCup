@@ -6,17 +6,17 @@ import { TeamPlayers, User, TeamInfos } from "@/lib/types"
 import SearchPlayers from "./SearchPlayers"
 
 interface AddPlayerTimeProps {
-  team_players: TeamPlayers[];
+  players: TeamPlayers[];
   user: User;
   team: TeamInfos;
 }
-export function AddPlayerTime({ team_players, user, team }: AddPlayerTimeProps) {
-  const playerCount = Object.keys(team_players).length;
+export function AddPlayerTime({ players, user, team }: AddPlayerTimeProps) {
+  const playerCount = Object.keys(players).length;
   return (
     <Drawer>
       <DrawerTrigger asChild>
         <Button className="flex items-center gap-2" variant="default">
-          <UserRoundPlus size={19} /> Convidar Player
+          <UserRoundPlus size={19} /> <span className="max-sm:hidden">Convidar Player</span>
         </Button>
       </DrawerTrigger>
       <DrawerContent>
@@ -29,7 +29,7 @@ export function AddPlayerTime({ team_players, user, team }: AddPlayerTimeProps) 
             <div className="flex flex-col border rounded-xl">
 
               {playerCount < 6 ? (
-                <SearchPlayers team_players={team_players} team={team} />
+                <SearchPlayers players={players} team={team} />
               ) : (
                 <div className="flex flex-col justify-center items-center p-2">
                   <ShieldAlert className="mb-1 text-red-800" size={40} />

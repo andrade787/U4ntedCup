@@ -23,35 +23,53 @@ export interface Notification {
 export interface UserContextProps {
   user: User | null;
   notifications: Notification[];
+  playerTeam: TeamInfos | null;
+  playerTeamLoading: boolean;
   setUser: (user: User | null) => void;
   logout: () => Promise<void>;
 }
 
 export interface User {
   uid: string;
-  email: string | null;
-  name: string | null;
-  photoURL: string | null;
-  nickname: string | null;
-  url: string | null;
+  name: string;
+  nickname: string;
+  email: string;
+  capaUrl: string;
+  photoURL: string;
+  number: string;
+  signaturePlayer: string;
+  url: string;
+  createdAt: string;
   token: string;
-  activeTeamId: string | null;
-  urlTeam: string | null;
-  nameTeam: string | null;
-  logoTeam: string | null;
 }
 
 export interface PlayerData {
-  id: string;
-  name: string;
+  uid: string;
+  firstName: string;
   photoURL: string;
   nickname: string;
   url: string;
-  cs2: boolean;
-  valorant: boolean;
   capaUrl: string;
   assinaturaPlayer: string;
-  gameAccounts: { [key: string]: any } | null;
+}
+
+export interface GameAccount {
+  card: string;
+  current_tier: string;
+  current_tier_image: string;
+  current_tier_triangle_up: string;
+  highest_rank_patched_tier: string;
+  highest_rank_season: string;
+  highest_rank_tier: number;
+  last_update: string;
+  nick: string;
+  puuid: string;
+  recent_season: string;
+  recent_season_number_of_games: number;
+  recent_season_wins: number;
+  region: string;
+  role: string;
+  tag: string;
 }
 
 export interface PlayerProps {
@@ -75,45 +93,81 @@ export interface TeamPlayers {
   signaturePlayer: string;
   playerId: string;
   capaUrl: string | null;
-  email: string;
+  email?: string;
   firstName: string;
   nickname: string;
   photoURL: string | null;
   roles: string[];
   url: string;
-  joinedAt: string;
-  leaveDate: string | null;
+  joinedAt?: string;
+  leaveDate?: string | null;
 }
 
 export interface TeamProviderProps {
   team: TeamInfos;
   user: User;
-  team_players: TeamPlayers[];
+  players: TeamPlayers[];
   children: ReactNode;
 }
 
 export interface TeamContextProps {
   team: TeamInfos;
   user: User;
-  team_players: TeamPlayers[];
+  players: TeamPlayers[];
   setTeamPlayers: React.Dispatch<React.SetStateAction<TeamPlayers[]>>;
 }
 
 export interface TeamProps {
   user: User;
-  ValueUrl: string | null;
   team: TeamInfos;
-  team_players: TeamPlayers[];
+  players: TeamPlayers[];
 }
 
 
-
 export interface Tournament {
-  id: string;
+  id?: string;
   name: string;
   game: string;
-  startDate: number;
-  endDate: number;
-  status: string;
-  createdAt: number;
+  startDate: string;
+  endDate: string;
+  imageCamp: string;
+  createdAt: string;
+  status: 'upcoming' | 'finished' | 'ongoing';
+  campUrl: string;
+  teamsCount: number;
+  prize?: number;
+  broadcast?: string;
+  registrationPrice?: number;
+  statistics?: string;
+  moderators?: string;
+  discord?: string;
+  pickbanSystem?: string;
+  bestPlayerPrize?: string;
+  mvpVoting?: string;
+  inverseMvpVoting?: string;
+  interviews?: string;
+  highlights?: string;
+}
+
+export interface TournamentContextProps {
+  tournament: Tournament | null;
+  notFound: boolean;
+  campUrl: string;
+  user: User;
+  tournamentTeams: TeamInfos[] | null;
+  SoldOut: boolean;
+  teamsRemaining: number;
+  teamsWithPlayers: (TeamInfos & { players: TeamPlayers[] })[] | null;
+  fetchPlayersForTeams: () => Promise<void>;
+  loading: boolean;
+  rules: string | null;
+  fetchRules: (tournamentId: string) => Promise<void>;
+}
+
+export interface TournamentProviderProps {
+  children: ReactNode;
+  tournament: Tournament | null;
+  notFound: boolean;
+  campUrl: string;
+  user: User;
 }

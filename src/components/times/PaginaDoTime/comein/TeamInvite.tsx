@@ -24,7 +24,7 @@ export default function TeamInvite() {
 
     try {
       setLoading(true);
-      const response = await fetch(`/api/player/${requestId}/accept-invite`, {
+      const response = await fetch(`/api/player/requests/${requestId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

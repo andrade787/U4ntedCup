@@ -20,24 +20,7 @@ export const withUser = async (context: GetServerSidePropsContext) => {
 
     const userData = userDocSnap.exists ? userDocSnap.data() : {};
 
-    // vejo se o usuario tem um time ou nao e crio um token personalizado
-    const [activeTeamsQuerySnap, customToken] = await Promise.all([
-      firestore.collection('players').doc(uid).collection('teams').where('status', '==', 'active').limit(1).get(),
-      admin.auth().createCustomToken(uid)
-    ]);
-
-
-    let activeTeamData = null;
-    if (!activeTeamsQuerySnap.empty) {
-      const activeTeamDoc = activeTeamsQuerySnap.docs[0];
-      const teamId = activeTeamDoc.id;
-
-      const teamDocSnap = await firestore.collection('teams').doc(teamId).get();
-
-      if (teamDocSnap.exists) {
-        activeTeamData = teamDocSnap.data();
-      }
-    }
+    const customToken = await admin.auth().createCustomToken(uid);
 
     return {
       uid: user.uid,
@@ -47,10 +30,6 @@ export const withUser = async (context: GetServerSidePropsContext) => {
       nickname: userData?.nickname || null,
       url: userData?.url || null,
       token: customToken,
-      activeTeamId: activeTeamData?.id || null,
-      urlTeam: activeTeamData?.url || null,
-      nameTeam: activeTeamData?.name || null,
-      logoTeam: activeTeamData?.logo || null,
     };
   } catch (error) {
     console.error('Error verifying or refreshing token: ', error);

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
-import { User, UserContextProps, Notification } from "@/lib/types";
+import { User, UserContextProps, Notification, TeamInfos } from "@/lib/types";
 import { auth, database } from "@/firebase/firebaseConfig";
 import { signInWithCustomToken, signOut } from "firebase/auth";
 import { ref, onValue, off, DatabaseReference } from "firebase/database";
@@ -9,6 +9,8 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [playerTeam, setPlayerTeam] = useState<TeamInfos | null>(null);
+  const [playerTeamLoading, setPlayerTeamLoading] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const notificationRef = useRef<DatabaseReference | null>(null);
 
@@ -20,6 +22,30 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      const fetchPlayerTeam = async (user: User) => {
+        try {
+          setPlayerTeamLoading(true);
+          const response = await fetch(`/api/player/${user.uid}/teams?status=active`);
+          const playerTeamData = await response.json();
+          if (response.ok && Array.isArray(playerTeamData) && playerTeamData.length > 0) {
+            setPlayerTeam(playerTeamData[0]);
+          } else {
+            setPlayerTeam(null);
+          }
+        } catch (error) {
+          setPlayerTeam(null);
+        } finally {
+          setPlayerTeamLoading(false);
+        }
+      };
+      if (!playerTeam) {
+        fetchPlayerTeam(user);
+      }
+    }
+  }, [user, playerTeam]);
+
   const handleValueChange = useCallback((snapshot: any) => {
     if (snapshot.exists()) {
       const data = snapshot.val();
@@ -28,7 +54,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         .filter((notification) => !notification.isRead);
 
       setNotifications(newNotifications);
-      console.log(newNotifications);
     } else {
       setNotifications([]);
     }
@@ -73,7 +98,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, notifications, setUser, logout }}>
+    <UserContext.Provider value={{ user, notifications, playerTeam, playerTeamLoading, setUser, logout }}>
       {children}
     </UserContext.Provider>
   );

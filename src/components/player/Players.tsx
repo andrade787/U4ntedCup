@@ -101,7 +101,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
           <>
             {displayedPlayers.length > 0 ? (
               displayedPlayers.map((player, index) => {
-                const backgroundUrl = player.capaUrl ? player.capaUrl : '/assets/images/uanted_thumb.png';
+                const backgroundUrl = player.capaUrl ? player.capaUrl : '/assets/images/uanted_thumb.webp';
                 return (
                   <div key={index} className="flex flex-col bg-zinc-900 rounded-xl animate-in fade-in-30">
                     <div className="flex flex-col items-center justify-center p-4 relative">
@@ -109,7 +109,7 @@ export default function PlayersUantedCup({ search }: PlayersUantedCupProps) {
                       <div className="w-full h-full rounded-xl from-20% bg-gradient-to-t from-zinc-900 absolute"></div>
                       <div className="relative w-full flex flex-col items-center justify-center">
                         <Avatar className="w-28 h-28 mb-2">
-                          <AvatarImage src={player.photoURL}></AvatarImage>
+                          <AvatarImage className="object-cover w-full" src={player.photoURL}></AvatarImage>
                           <AvatarFallback className="bg-zinc-800 flex w-full items-center justify-center text-2xl font-semibold">
                             {player.nickname.charAt(0).toUpperCase()}
                           </AvatarFallback>

@@ -35,8 +35,8 @@ const CardPlayers: React.FC<CardPlayersProps> = ({ player, user, team, isOwner }
 
   return (
     <div className={`bg-zinc-800/50 hover:bg-zinc-800 transition-colors rounded-xl w-full ${classNameDiff}`}>
-      <div className="flex justify-between items-center gap-3">
-        <div className="flex items-center gap-4">
+      <div className="flex max-sm:flex-col flex-wrap justify-between items-center md:gap-3">
+        <div className="flex items-center gap-4 max-sm:w-full">
           <Link target="_blank" href={`/player/${player.url}`}>
             <Avatar className="rounded-l-xl hover:opacity-80 transition-all">
               <AvatarImage className='rounded-l-xl w-25 h-25 object-cover' src={player.photoURL || ''} />
@@ -49,7 +49,7 @@ const CardPlayers: React.FC<CardPlayersProps> = ({ player, user, team, isOwner }
             <Link target="_blank" href={`/player/${player.url}`}>
               <h3 className="text-lg hover:text-zinc-400 transition-colors font-semibold mb-1">{player.nickname}</h3>
             </Link>
-            <div className='flex gap-3'>
+            <div className='flex flex-wrap gap-3'>
               {player.roles.map((role, index) => {
                 const roleKey = `${role}-${index}`;
                 if (specialRoles[role]) {
@@ -71,8 +71,8 @@ const CardPlayers: React.FC<CardPlayersProps> = ({ player, user, team, isOwner }
             </div>
           </div>
         </div>
-        <div className='flex items-center'>
-          {player.playerId == team.owner && <h3 className="flex items-center gap-2 mr-2 bg-gradient-to-l from-MvpColor/30 font-medium rounded-xl p-2"><Crown /> DONO</h3>}
+        <div className='flex items-center max-sm:w-full max-sm:mt-2'>
+          {player.playerId == team.owner && <h3 className="flex items-center max-sm:flex-1 gap-2 mr-2 bg-gradient-to-l from-MvpColor/30 font-medium rounded-xl p-2"><Crown /> DONO</h3>}
 
 
           {user && user.uid == isOwner && <EditPlayerTeam team={team.id} isOwner={isOwner} nickname={player.nickname} roles={player.roles} playerId={player.playerId} />}
